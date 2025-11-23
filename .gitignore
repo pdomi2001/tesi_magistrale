@@ -1,0 +1,10 @@
+#ignora i file di log
+*.log
+
+*.aux
+
+*.lof
+
+*.lot
+
+*.synctex.gz

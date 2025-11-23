@@ -1,0 +1,13 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {chapter}{\numberline {1}Introduzione}{1}{}%
+\contentsline {section}{\numberline {1.1}Scopo del progetto}{1}{}%
+\contentsline {section}{\numberline {1.2}Introduzione al problema}{1}{}%
+\contentsline {section}{\numberline {1.3}Possibili soluzioni}{2}{}%
+\contentsline {subsection}{\numberline {1.3.1}Aumento delle risorse}{2}{}%
+\contentsline {subsection}{\numberline {1.3.2}Allocazione dinamica delle risorse}{2}{}%
+\contentsline {subsection}{\numberline {1.3.3}Un nuovo approccio}{3}{}%
+\contentsline {chapter}{\numberline {2}Capitolo 2}{4}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{5}{}%
+\contentsline {chapter}{Bibliografia}{6}{}%
+\contentsline {chapter}{Ringraziamenti}{7}{}%

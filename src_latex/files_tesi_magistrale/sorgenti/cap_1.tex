@@ -46,8 +46,8 @@ In questi casi l'investimento dal punto di vista temporale, rispetto al caso pre
 
 D'altro canto l'investimento economico in questi ultimi due casi \'e necessariamente pi\'u grande di quello richiesto dal primo caso di cui abbiamo parlato.
 
-\subsection{Un nuovo paradigma}
-Il lavoro che verrà portato avanti in questa tesi si pone come obiettivo quello di trovare un sistema per evitare il problema del sovraccarico del server web da parte di troppe connessioni contemporanee senza dover investire in nuove risorse.
+\subsection{Un nuovo approccio}
+Il lavoro che verrà portato avanti in questa tesi si pone come obiettivo quello di trovare un sistema per evitare il problema del sovraccarico del server web da parte di troppe connessioni contemporanee senza dover investire in nuove risorse hardware.
 
 Per far questo creeremo in layer intermedio tra il web server e i client come in Figura \ref{fig:nuova_configurazione}.
 
@@ -57,6 +57,8 @@ Per far questo creeremo in layer intermedio tra il web server e i client come in
 	\label{fig:nuova_configurazione}
 \end{figure}
 
-Questo nuovo layer deve occuparsi, tramite l'uso di messaggi, di fare da tramite tra i client e il server web.
+Questo nuovo layer deve occuparsi, usando dei messaggi, di fare da tramite tra i client e il server web gestendo le richieste in modo che non ne arrivino troppe contemporaneamente al web server.
+
+Sfortunatamente questo richiederà anche di cambiare il modo in cui i client e il server comunicano tra di loro.
 
 
