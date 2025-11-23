@@ -7,7 +7,11 @@
 \contentsline {subsection}{\numberline {1.3.1}Aumento delle risorse}{2}{}%
 \contentsline {subsection}{\numberline {1.3.2}Allocazione dinamica delle risorse}{2}{}%
 \contentsline {subsection}{\numberline {1.3.3}Un nuovo approccio}{3}{}%
-\contentsline {chapter}{\numberline {2}Capitolo 2}{4}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{5}{}%
-\contentsline {chapter}{Bibliografia}{6}{}%
-\contentsline {chapter}{Ringraziamenti}{7}{}%
+\contentsline {chapter}{\numberline {2}Analisi dei requisiti}{4}{}%
+\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{5}{}%
+\contentsline {chapter}{\numberline {4}Implementazione in Erlang}{6}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{7}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{8}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{9}{}%
+\contentsline {chapter}{Bibliografia}{10}{}%
+\contentsline {chapter}{Ringraziamenti}{11}{}%
