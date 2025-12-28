@@ -1,1 +1,24 @@
 \chapter{Analisi dei requisiti}
+
+\section{Comunicazione}
+La prima cosa che dobbiamo analizzare \'e la tipologia di messaggi che possono essere scambiati tra il gestore dei messaggi, i client e il server che gestisce i test.
+
+Per avere un riferimento stiliamo innanzitutto un elenco dei messaggi che potrebbero essere scambiati tra il server e i client in una situazione standard.
+\subsection{Esempi di messaggi che possono essere utilizzati}
+\begin{itemize}
+	\item Registrazione nuova postazione
+	\item De-registrazione postazione
+	\item Richiesta codice di accesso
+	\item Invio codice di accesso
+	\item Richiesta invio dati studente
+	\item Invio dati studente
+	\item Richiesta test da somministrare
+	\item Invio contenuto del test da somministrare
+	\item Invio risposte test
+	\item Termine forzato del test
+	\item Mostra messaggio sulla postazione
+	\item Richiesta stato postazione
+\end{itemize}
+\subsection{requisiti tecnici}
+Per poter poter comunicare sia lato client che lato server, visto che le comunicazioni avvengono gi\'a su http o https non useremo erlang direttamente ma ci affideremo al web server Yaws \cite{web:yaws} che \'e stato implentato proprio in Erlang e che permette di inserire all'interno del codice html, in modo simile a php, direttamente chiamate a codice erlang.
+Saremo costretti ad adattare il codice del client e del server in modo che comunichino attraverso il nuovo gestore dei messaggi.
