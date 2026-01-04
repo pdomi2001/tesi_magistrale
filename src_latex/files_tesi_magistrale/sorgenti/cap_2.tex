@@ -19,6 +19,15 @@ Per avere un riferimento stiliamo innanzitutto un elenco dei messaggi che potreb
 	\item Mostra messaggio sulla postazione
 	\item Richiesta stato postazione
 \end{itemize}
-\subsection{requisiti tecnici}
+\subsection{Requisiti tecnici}
 Per poter poter comunicare sia lato client che lato server, visto che le comunicazioni avvengono gi\'a su http o https non useremo erlang direttamente ma ci affideremo al web server Yaws \cite{web:yaws} che \'e stato implentato proprio in Erlang e che permette di inserire all'interno del codice html, in modo simile a php, direttamente chiamate a codice erlang.
 Saremo costretti ad adattare il codice del client e del server in modo che comunichino attraverso il nuovo gestore dei messaggi.
+
+\section{Diagrammi degli stati}
+Per comprendere meglio 
+
+\begin{figure}[!hbtp]
+	\includegraphics[width=1.0\textwidth]{figure/diagramma_degli_stati_client.png}
+	\caption{Diagramma degli stati del Client}
+	\label{fig:diagramma_stati_client}
+\end{figure}
