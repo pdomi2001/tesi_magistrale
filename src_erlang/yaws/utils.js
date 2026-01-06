@@ -22,7 +22,3 @@ const request = (url, params = {}, method = "GET") => {
 const get = (url, params) => request(url, params, "GET");
 const post = (url, params) => request(url, params, "POST");
 
-// Test.
-get("https://jsonplaceholder.typicode.com/posts/1").then((post) => {
-  document.getElementById("app").innerHTML = post.title;
-});

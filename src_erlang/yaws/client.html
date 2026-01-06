@@ -10,7 +10,16 @@
 
 	<h2>Test javascript</h2>
 	<div id="app"></div>
-	<script src="utils.js">
+	<script src="utils.js">	</script>
+	<script>
+		// Test.
+		/* get("https://jsonplaceholder.typicode.com/posts/1").then((post) => {
+			document.getElementById("app").innerHTML = post.title;
+		}); */
+		get("server.yaws").then((post) => {
+			document.getElementById("app").innerHTML = post.title;
+		});
+
 	</script>
 </body>
 </html>

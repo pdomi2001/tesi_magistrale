@@ -1,0 +1,2 @@
+-module(msg_func). % Opzionale, ma utile
+-export([test_reply/0, test_reply/1]).

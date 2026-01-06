@@ -1,0 +1,14 @@
+<erl>
+	%-include("msg_func.hrl").
+	 
+	test_reply() ->
+	io_lib:format("{\"title\": \"post\", \"post\": ~p }", ["test post"]). 
+
+	out(Arg) ->   
+		{ehtml, test_reply()}.
+
+</erl>
+<!--
+		%msg_func:test_reply(Arg).
+		%{ehtml, f("{\"title\": \"post\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
+-->
