@@ -1,14 +1,19 @@
 <erl>
 	%-include("msg_func.hrl").
 	 
-	test_reply() ->
-	io_lib:format("{\"title\": \"post\", \"post\": ~p }", ["test post"]). 
+	test_reply(Arg) ->
+		case method(Arg) of
+			GET -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"get\": ~p }", ["test post"]);
+
+			POST ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"post\": ~p }", ["test post"]) 
+		end
+	.
+	
+	method(Arg) ->  Rec = Arg#arg.req,   Rec#http_request.method. 
 
 	out(Arg) ->   
-		{ehtml, test_reply()}.
+		{ehtml, test_reply(Arg)}.
+	%msg_func:test_reply(Arg).
+	%{ehtml, f("{\"title\": \"post\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
 
 </erl>
-<!--
-		%msg_func:test_reply(Arg).
-		%{ehtml, f("{\"title\": \"post\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
--->

@@ -13,6 +13,7 @@
 \contentsline {subsection}{\numberline {2.1.2}Requisiti tecnici}{5}{}%
 \contentsline {section}{\numberline {2.2}Diagrammi degli stati}{5}{}%
 \contentsline {chapter}{\numberline {3}Strutture di comunicazione}{6}{}%
+\contentsline {section}{\numberline {3.1}Struttura JSON}{6}{}%
 \contentsline {chapter}{\numberline {4}Implementazione in Erlang}{7}{}%
 \contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{8}{}%
 \contentsline {chapter}{\numberline {6}Conclusioni}{9}{}%
