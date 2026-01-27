@@ -3,9 +3,9 @@
 	 
 	test_reply(Arg) ->
 		case method(Arg) of
-			GET -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"get\": ~p }", ["test post"]);
+			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"get\": ~p }", ["test post"]);
 
-			POST ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"post\": ~p }", ["test post"]) 
+			'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", ["test post"]) 
 		end
 	.
 	
@@ -13,7 +13,8 @@
 
 	out(Arg) ->   
 		{ehtml, test_reply(Arg)}.
-	%msg_func:test_reply(Arg).
-	%{ehtml, f("{\"title\": \"post\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
+		%{ehtml, f("{\"title\": \"title\", \"method\": \"~p\" }", [method(Arg)])}.  
+		%msg_func:test_reply(Arg).
+		%{ehtml, f("{\"title\": \"title\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
 
 </erl>

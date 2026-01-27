@@ -9,7 +9,10 @@
 	<p><a href="">De-Registrazione postazione sulla piattaforma</a></p>
 
 	<h2>Test javascript</h2>
-	<div id="app"></div>
+	<h3>Test get</h3>
+	<div id="get"></div>
+	<h3>Test POST</h3>
+	<div id="post"></div>
 	<script src="utils.js">	</script>
 	<script>
 		// Test.
@@ -17,7 +20,11 @@
 			document.getElementById("app").innerHTML = post.title;
 		}); */
 		get("server.yaws").then((post) => {
-			document.getElementById("app").innerHTML = post.title;
+			document.getElementById("get").innerHTML = post.method;
+		});
+		
+		post("server.yaws").then((post) => {
+			document.getElementById("post").innerHTML = post.method;
 		});
 
 	</script>
