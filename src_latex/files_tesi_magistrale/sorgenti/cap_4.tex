@@ -3,3 +3,10 @@ Per l'implementazione ci affideremo al web server implementato in Erlang\cite{we
 
 Yaws usa un sistema simile a quello di PHP.
 Permette infatti di includere codice erlang direttamente all'interno della pagina WEB inserendolo all'interno delle coppia di tag <erl> e </erl>.
+
+La comunicazione tra client e server avviene tramite il passaggio di messaggi attraverso il gestore dei messaggi in erlang.
+
+Questa si compone di due fasi distinte: la comunicazione tra il client e il gestore di messaggi e la comunicazione tra il gestore di messaggi e il server vero e proprio.
+Il client comunicher\'a con il gestore del messaggi attraverso semplici connessioni http o https in get o post che verranno processate dall'interprete erlang in Yaws.
+Nella seconda fase il gestore di messaggi, in modo controllato in modo che non sovraccarichi il web server che si occupa di memorizzare le prove svolte dagli utenti.
+
