@@ -1,4 +1,4 @@
-\chapter{Implementazione in Erlang}
+\chapter{Implementazione della comunicazione}
 Per l'implementazione ci affideremo al web server implementato in Erlang\cite{web:erlang},  Yaws\cite{web:yaws}. 
 
 Yaws usa un sistema simile a quello di PHP.
@@ -7,6 +7,35 @@ Permette infatti di includere codice erlang direttamente all'interno della pagin
 La comunicazione tra client e server avviene tramite il passaggio di messaggi attraverso il gestore dei messaggi in erlang.
 
 Questa si compone di due fasi distinte: la comunicazione tra il client e il gestore di messaggi e la comunicazione tra il gestore di messaggi e il server vero e proprio.
-Il client comunicher\'a con il gestore del messaggi attraverso semplici connessioni http o https in get o post che verranno processate dall'interprete erlang in Yaws.
-Nella seconda fase il gestore di messaggi, in modo controllato in modo che non sovraccarichi il web server che si occupa di memorizzare le prove svolte dagli utenti.
+
+Nella prima il client comunicher\'a con il gestore del messaggi attraverso semplici connessioni http o https in get o post che verranno processate dall'interprete erlang in Yaws.
+
+Nella seconda fase il gestore di messaggi, comunicher\'a con web server PHP. Per evitare che si ripresenti lo stesso problema che avevamo con troppi client implementeremo una procedura che permetta solo un numero massimo di connessioni contemporanee. Sar\'a il gestore dei messaggi a permettere a tutti i client di collegarsi contemporaneamente e ad inviare i messaggi ricevuti al server al ritmo che il server accetta.
+
+\section{Comunicazione tra client e gestore dei messaggi}
+
+
+\section{Comunicazione tra gestore dei messaggi e server PHP}
+\subsection{Ricezione dei messaggi in PHP}
+Ci sono diversi metodi per limitare il numero connessioni che il server PHP accetta dal gestore dei messaggi. Alcuni dei pi\'u comuni sono:
+\begin{itemize}
+	\item Webhooks semplice (Push asincrono via HTTP)
+	\item Semaphore (Semafori a livello di Sistema Operativo) 
+	\item Gestione tramite il Web Server (Nginx / PHP-FPM)
+	\item Usare una tabella del database per gestire il numero di processi
+\end{itemize}
+
+Ognuno di questi ha dei vantaggi e degli svantaggi. Webhooks ad esempio ha il vantaggio che \'e il gestore dei messaggi ad inviare i messaggi ma rimane con lo stesso problema che abbiamo con la configurazione originale client/server; rischiamo infatti che il server di sovraccarichi.
+Semaphore d'altro canto richiede, per l'utilizzo dei semafori del sistema operativo, che il nostro web server si trovi su un distribuzione Linux.
+La gestione del numero massimo di processi modificando la configurazione del web server richiede invece la possibilit\'a di modificare i file di configurazione, cosa che non sempre \'e possibile e che dipende dalla scelta della macchina su cui far girare i nostri sorgenti php. Potrebbe essere una configurazione condivisa senza possibilit\'a di cambiare i parametri di base.
+
+L'utilizzo di una tabella del nostro database mysql o mariadb per gestire il numero massimo di richieste in arrivo dal gestore dei messaggi sembra quindi essere la soluzione migliore.
+Non siamo legati al sistema operativo e non abbiamo bisogno di accedere alla configurazione di PHP. Il database \'e gi\'a installato per memorizzare i risultati delle prove svolte.
+
+\subsection{Implementazione del codice per limitare le connessioni}
+Come già detto, per limitare le connessioni al server web PHP, implementeremo una gestione apposita. 
+
+Nel momento arriva una nuova connessione andremo a vedere, nella tabella delle connessioni attive, quante connessioni sono gi\'a in essere. Se il numero supera il numero massimo stabilito risponderemo alla chiamata con un messaggio che indichi il sovraccarico. In caso contrario aggiungeremo alla tabella un elemento ed eseguiremo il comando che ci \'e stato richiesto. Al termine del comando cancelleremo dalla tabella la riga corrispondente.
+
+Potrebbe per\'o capitare che, per errori nel codice php o altro, l'esecuzione si interrompa in modo inaspettato lasciando nella tabella una riga non pi\'u valida. L'accumulo di queste righe impedir\'a la ricezione di nuovi messaggi da parte del gestore dei messaggi. Implementeremo quindi una procedura di emergenza che, in modo pseudo-casuale, cancelli gli elementi della tabella pi\'u vecchi. Possiamo stabilire, come tempo massimo di permanenza nella tabella, una trentina di secondi. Sar\'a infatti molto improbabile che ci siano processi che richiedano pi\'u id una decina di secondi per essere eseguiti. 
 
