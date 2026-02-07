@@ -33,7 +33,7 @@ L'utilizzo di una tabella del nostro database mysql o mariadb per gestire il num
 Non siamo legati al sistema operativo e non abbiamo bisogno di accedere alla configurazione di PHP. Il database \'e gi\'a installato per memorizzare i risultati delle prove svolte.
 
 \subsection{Implementazione del codice per limitare le connessioni}
-Come già detto, per limitare le connessioni al server web PHP, implementeremo una gestione apposita. 
+Come gi\'a detto, per limitare le connessioni al server web PHP, implementeremo una gestione apposita. 
 
 Nel momento arriva una nuova connessione andremo a vedere, nella tabella delle connessioni attive, quante connessioni sono gi\'a in essere. Se il numero supera il numero massimo stabilito risponderemo alla chiamata con un messaggio che indichi il sovraccarico. In caso contrario aggiungeremo alla tabella un elemento ed eseguiremo il comando che ci \'e stato richiesto. Al termine del comando cancelleremo dalla tabella la riga corrispondente.
 
