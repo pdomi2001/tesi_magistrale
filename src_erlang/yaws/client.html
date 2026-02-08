@@ -22,17 +22,27 @@
 			document.getElementById("app").innerHTML = post.title;
 		}); */
 		get("server.yaws").then((post) => {
-			document.getElementById("get").innerHTML = post.method;
+			document.getElementById("get").innerHTML = post.result;
+		});
+		post("server.yaws").then((post_res) => {
+			document.getElementById("post").innerHTML = post_res.result;
 		});
 		
-		post("server.yaws").then((post) => {
-			document.getElementById("post").innerHTML = post.method;
-		});
+		const utenti = [
+    { id: 1, nome: "Luca" },
+    { id: 2, nome: "Sara" }
+];
 
-		post("server.yaws", "parametri").then((post) => {
-			document.getElementById("post_parametri").innerHTML = post.method;
-		});
+// Parametri: (oggetto, replacer, spazi)
+const jsonBello = JSON.stringify(utenti, null, 4);
 
+console.log(jsonBello);
+
+		post("server.yaws", jsonBello).then((post_res) => {
+			document.getElementById("post_parametri").innerHTML = post_res.result;
+		});
+		/*
+*/
 	</script>
 </body>
 </html>

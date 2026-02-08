@@ -3,15 +3,17 @@
 	 
 	test_reply(Arg) ->
 		case method(Arg) of
-			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"get\": ~p }", ["test get"]);
+			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"result\": ~p }", ["test get"]);
 
-			'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", ["test post"])
+			'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"result\": ~p }", [unicode:characters_to_list(string:replace(Arg#arg.clidata, "\"", ""))])
 		end
 	.
 	
 	method(Arg) ->  Rec = Arg#arg.req,   Rec#http_request.method. 
 
-	get_data(Arg) ->  rfc4627:decode(Arg#arg.clidata). 
+	get_data(Arg) ->  
+		{ok, Json, _}  = rfc4627:decode(Arg#arg.clidata),
+		io:format("~n~p:~p POST request ~p~n", [?MODULE, ?LINE, Json]).
 
 	out(Arg) ->   
 		{ehtml, test_reply(Arg)}.
