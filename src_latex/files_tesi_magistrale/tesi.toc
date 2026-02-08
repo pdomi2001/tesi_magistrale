@@ -19,8 +19,8 @@
 \contentsline {section}{\numberline {4.2}Comunicazione tra gestore dei messaggi e server PHP}{7}{}%
 \contentsline {subsection}{\numberline {4.2.1}Ricezione dei messaggi in PHP}{7}{}%
 \contentsline {subsection}{\numberline {4.2.2}Implementazione del codice per limitare le connessioni}{8}{}%
-\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{9}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{10}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{11}{}%
-\contentsline {chapter}{Bibliografia}{12}{}%
-\contentsline {chapter}{Ringraziamenti}{13}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{10}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{11}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{12}{}%
+\contentsline {chapter}{Bibliografia}{13}{}%
+\contentsline {chapter}{Ringraziamenti}{14}{}%

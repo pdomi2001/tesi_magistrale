@@ -13,6 +13,8 @@ Nella prima il client comunicher\'a con il gestore del messaggi attraverso sempl
 Nella seconda fase il gestore di messaggi, comunicher\'a con web server PHP. Per evitare che si ripresenti lo stesso problema che avevamo con troppi client implementeremo una procedura che permetta solo un numero massimo di connessioni contemporanee. Sar\'a il gestore dei messaggi a permettere a tutti i client di collegarsi contemporaneamente e ad inviare i messaggi ricevuti al server al ritmo che il server accetta.
 
 \section{Comunicazione tra client e gestore dei messaggi}
+Visto che il client gira su un browser la comunicazioni verr\'a gestita tramite codice Javascript.
+
 
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
@@ -37,5 +39,64 @@ Come gi\'a detto, per limitare le connessioni al server web PHP, implementeremo 
 
 Nel momento arriva una nuova connessione andremo a vedere, nella tabella delle connessioni attive, quante connessioni sono gi\'a in essere. Se il numero supera il numero massimo stabilito risponderemo alla chiamata con un messaggio che indichi il sovraccarico. In caso contrario aggiungeremo alla tabella un elemento ed eseguiremo il comando che ci \'e stato richiesto. Al termine del comando cancelleremo dalla tabella la riga corrispondente.
 
-Potrebbe per\'o capitare che, per errori nel codice php o altro, l'esecuzione si interrompa in modo inaspettato lasciando nella tabella una riga non pi\'u valida. L'accumulo di queste righe impedir\'a la ricezione di nuovi messaggi da parte del gestore dei messaggi. Implementeremo quindi una procedura di emergenza che, in modo pseudo-casuale, cancelli gli elementi della tabella pi\'u vecchi. Possiamo stabilire, come tempo massimo di permanenza nella tabella, una trentina di secondi. Sar\'a infatti molto improbabile che ci siano processi che richiedano pi\'u id una decina di secondi per essere eseguiti. 
+Potrebbe per\'o capitare che, per errori nel codice php o altro, l'esecuzione si interrompa in modo inaspettato lasciando nella tabella una riga non pi\'u valida. L'accumulo di queste righe impedir\'a la ricezione di nuovi messaggi da parte del gestore dei messaggi. Implementeremo quindi una procedura di emergenza che, ad intervalli casuali di tempo, cancelli gli elementi della tabella pi\'u vecchi. Possiamo stabilire, come tempo massimo di permanenza nella tabella, un minuto. Sar\'a infatti molto improbabile che ci siano processi che richiedano pi\'u id una trentina di secondi per essere eseguiti. 
+
+Creiamo quindi la tabella nel database:
+
+\begin{verbatim}
+CREATE TABLE processi_attivi (
+id INT AUTO_INCREMENT PRIMARY KEY,
+token_univoco VARCHAR(64), -- Per sicurezza extra nella cancellazione
+data_inizio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ultimo_heartbeat TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+\end{verbatim}
+
+Creiamo quindi il codice per controllare se ci sono ancora slot disponibili:
+
+\begin{verbatim}
+function GetMaxSlots() {
+  return 10;
+}	
+	
+function SlotIsFree($db) {
+  // Pulizia automatica (probabilita' 5% per ogni chiamata)
+  if (rand(1, 100) <= 5) {
+    // Elimina i record piu' vecchi di 1 minuto (processi probabilmente crashati)
+    $db->query("DELETE FROM processi_attivi
+     WHERE data_inizio < NOW() - INTERVAL 1 MINUTE");
+  }
+  $max_slots = GetMaxSlots();
+  $count = $db->query("SELECT COUNT(*) FROM processi_attivi")->fetchColumn();
+  
+  if ($count > $max_slot) {
+    return false;
+  }
+  return true;
+}
+\end{verbatim}
+
+Visto che \'e il codice che viene eseguito pi\'u spesso inseriamo qui il codice che, in modo casuale, cancella i record di processi attivi che si sono bloccati.
+
+Aggiungiamo quindi il codice per prenotare e sbloccare uno slot di esecuzione:
+
+\begin{verbatim}
+function LockSlot($db) {
+  $token = bin2hex(random_bytes(16)); // Generiamo un ID unico per questa esecuzione
+
+  // 1. Inseriamo il record per tentare di occupare uno slot
+  $stmt = $db->prepare("INSERT INTO processi_attivi (token_univoco) VALUES (?)");
+  $stmt->execute([$token]);
+  $mio_id = $db->lastInsertId();
+  
+  return $mio_id;	
+}	
+
+function UnLockSlot($db, $mio_id) {
+  if (isset($mio_id)) {
+    $db->prepare("DELETE FROM processi_attivi WHERE id = ?")->execute([$mio_id]);
+  }
+}	
+
+\end{verbatim}
 
