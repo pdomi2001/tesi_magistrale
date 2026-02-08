@@ -3,13 +3,15 @@
 	 
 	test_reply(Arg) ->
 		case method(Arg) of
-			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"get\": ~p }", ["test post"]);
+			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"get\": ~p }", ["test get"]);
 
-			'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", ["test post"]) 
+			'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", ["test post"])
 		end
 	.
 	
 	method(Arg) ->  Rec = Arg#arg.req,   Rec#http_request.method. 
+
+	get_data(Arg) ->  rfc4627:decode(Arg#arg.clidata). 
 
 	out(Arg) ->   
 		{ehtml, test_reply(Arg)}.
