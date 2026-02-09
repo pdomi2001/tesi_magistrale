@@ -5,7 +5,12 @@
 		case method(Arg) of
 			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"result\": ~p }", ["test get"]);
 
-			'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"result\": ~p }", [unicode:characters_to_list(string:replace(Arg#arg.clidata, "\"", ""))])
+			'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", ["[{\"prova\": \"valore\", \"prova2\": \"valore2\" }]"])
+			%'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [Arg#arg.clidata])
+			%'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", [rfc4627:decode("[{\"prova\": \"valore\"; \"prova2\": \"valore2\" }]")])
+			%'POST' ->	
+			%			data = Arg#arg.clidata, %rfc4627:decode(Arg#arg.clidata),
+			%			io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", ["[{\"prova\": \"valore\"; \"prova2\": \"valore2\" }]"])
 		end
 	.
 	

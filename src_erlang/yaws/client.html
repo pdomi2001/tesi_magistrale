@@ -34,12 +34,15 @@
 ];
 
 // Parametri: (oggetto, replacer, spazi)
-const jsonBello = JSON.stringify(utenti, null, 4);
+//const jsonBello = JSON.stringify(utenti, null, 4);
+const jsonBello = JSON.stringify(utenti);
 
 console.log(jsonBello);
 
 		post("server.yaws", jsonBello).then((post_res) => {
 			document.getElementById("post_parametri").innerHTML = post_res.result;
+			const returnData = JSON.parse(post_res.result);
+			console.log( returnData[0].prova);
 		});
 		/*
 */
