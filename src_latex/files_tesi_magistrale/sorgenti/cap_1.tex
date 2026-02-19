@@ -23,9 +23,9 @@ In linea di massima lo schema \'e quello visibile in figura \ref{fig:configurazi
 In questa modalit\'a ogni client fa una serie di chiamate al server web che genera dinamicamente la pagina da visualizzare sul browser del client.
 Questa pagina viene generata diversamente in base allo stato in cui si trova il client. Ad esempio potrebbe essere la pagina per fare il login alla piattaforma oppure quella in cui si inseriscono i propri dati passando per le pagine in cui ci sono le domande del test con i campi in cui l'utente inserisce la risposta esatta fino ad arrivare alla pagina con il punteggio realizzato del test.
 
-Tutte queste interazioni avvengono, attraverso chiamate http o https e sfruttano direttamente le risorse della macchina su cui \'e installato in web server.
+Tutte queste interazioni avvengono, attraverso chiamate http o https e sfruttano direttamente le risorse della macchina su cui \'e installato il web server.
 
-All'aumentare del numero di utenti che si collegano aumenta anche la quantit\'a di risorse che vengono utilizzate fino ad arrivare ad un punto, dipendente dalla architettura e dalle risorse presenti sulla macchina che impedisce al web server di funzionare correttamente provocando una serie di errori.
+All'aumentare del numero di utenti che si collegano aumenta anche la quantit\'a di risorse che vengono utilizzate fino ad arrivare ad un punto, dipendente dall'architettura e dalle risorse presenti sulla macchina che impedisce al web server di funzionare correttamente provocando una serie di errori.
 
 
 \section{Possibili soluzioni}
@@ -38,7 +38,7 @@ Questo si pu\'o fare acquistando nuovo hardware e installando sulla nuova macchi
 \subsection{Allocazione dinamica delle risorse}
 Un'altra soluzione pu\'o esser quella di installare il nostro web server, fin dal primo momento, in un sistema che permetta una scalabilit\'a delle risorse dinamica senza essere legati direttamente all'hardware presente.
 
-Un primo livello \'e una creare una server farm interna all'azienda che permetta la gestione delle macchine in ambiente virtuale. In questo caso lo sfruttamento delle risorse viene gestito e diviso, tra le risorse disponibili, da una infrastruttura di base che nasconde il vero hardware.
+Un primo livello \'e creare una server farm interna all'azienda che permetta la gestione delle macchine in ambiente virtuale. In questo caso lo sfruttamento delle risorse viene gestito e diviso, tra le risorse disponibili, da una infrastruttura di base che nasconde il vero hardware.
 
 Un secondo livello \'e quello di affidarsi a sistemi distribuiti a livello geografico come Amazon AWS, Microsoft Azure, ecc. che permettono anche di allocare dinamicamente le risorse in base al carico di lavoro che \'e in quel momento presente sul nostro sistema.
 
@@ -61,4 +61,8 @@ Questo nuovo layer deve occuparsi, usando dei messaggi, di fare da tramite tra i
 
 Sfortunatamente questo richieder\'a anche di cambiare il modo in cui i client e il server comunicano tra di loro.
 
+In particolare non sar\'a pi\'u direttamente il server a generare la pagina da visualizzare sul client ma passeremo ad una gestione pi\'u dinamica della creazione delle pagine direttamente sul client in javascript con un approccio di tipo Client Side Rendering o meglio ancora DOM Manipulation.
 
+Questo approccio richiede che il client abbia un browser pi\'u moderno dato che una parte del processo viene spostata lato client. D'altro canto ormai tantissime applicazioni, come ad esempio Google mail o Facebook, hanno questo tipo di approccio.
+
+Gli scambi tra il client, il gestore di messaggi e il server PHP, avverranno quindi solo tramite messaggi codificati in JSON e non come pagine web intere. Questo ci permetter\'a, in ottica futura, di poter modificare una singola parte (client, server o gestore di messaggi) senza dover modificare obbligatoriamente le altre.

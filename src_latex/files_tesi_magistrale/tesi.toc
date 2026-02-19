@@ -7,20 +7,20 @@
 \contentsline {subsection}{\numberline {1.3.1}Aumento delle risorse}{2}{}%
 \contentsline {subsection}{\numberline {1.3.2}Allocazione dinamica delle risorse}{2}{}%
 \contentsline {subsection}{\numberline {1.3.3}Un nuovo approccio}{3}{}%
-\contentsline {chapter}{\numberline {2}Analisi dei requisiti}{4}{}%
-\contentsline {section}{\numberline {2.1}Comunicazione}{4}{}%
-\contentsline {subsection}{\numberline {2.1.1}Esempi di messaggi che possono essere utilizzati}{4}{}%
-\contentsline {subsection}{\numberline {2.1.2}Requisiti tecnici}{5}{}%
-\contentsline {section}{\numberline {2.2}Diagrammi degli stati}{5}{}%
-\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{6}{}%
-\contentsline {section}{\numberline {3.1}Struttura JSON}{6}{}%
-\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{7}{}%
-\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{7}{}%
-\contentsline {section}{\numberline {4.2}Comunicazione tra gestore dei messaggi e server PHP}{7}{}%
-\contentsline {subsection}{\numberline {4.2.1}Ricezione dei messaggi in PHP}{7}{}%
-\contentsline {subsection}{\numberline {4.2.2}Implementazione del codice per limitare le connessioni}{8}{}%
-\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{10}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{11}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{12}{}%
-\contentsline {chapter}{Bibliografia}{13}{}%
-\contentsline {chapter}{Ringraziamenti}{14}{}%
+\contentsline {chapter}{\numberline {2}Analisi dei requisiti}{5}{}%
+\contentsline {section}{\numberline {2.1}Comunicazione}{5}{}%
+\contentsline {subsection}{\numberline {2.1.1}Esempi di messaggi che possono essere utilizzati}{5}{}%
+\contentsline {subsection}{\numberline {2.1.2}Requisiti tecnici}{6}{}%
+\contentsline {section}{\numberline {2.2}Diagrammi degli stati}{6}{}%
+\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{7}{}%
+\contentsline {section}{\numberline {3.1}Struttura JSON}{7}{}%
+\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{8}{}%
+\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{8}{}%
+\contentsline {section}{\numberline {4.2}Comunicazione tra gestore dei messaggi e server PHP}{8}{}%
+\contentsline {subsection}{\numberline {4.2.1}Ricezione dei messaggi in PHP}{8}{}%
+\contentsline {subsection}{\numberline {4.2.2}Implementazione del codice per limitare le connessioni}{9}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{11}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{12}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{13}{}%
+\contentsline {chapter}{Bibliografia}{14}{}%
+\contentsline {chapter}{Ringraziamenti}{15}{}%
