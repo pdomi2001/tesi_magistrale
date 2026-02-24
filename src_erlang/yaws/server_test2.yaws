@@ -1,0 +1,9 @@
+<erl>
+	out(Arg) ->   
+		{ok, Json, _}  = rfc4627:decode(Arg#arg.clidata),
+		io:format("~n~p:~p POST request ~p~n", [?MODULE, ?LINE, Json]),
+		Type  = rfc4627:get_field(Json, "msg-type", <<>>),
+		Type.
+		%{ehtml, io_lib:format("test: ~p", [Arg#arg.querydata])}. %get
+		%{ehtml, io_lib:format("test: ~p", [Arg#arg.clidata])}.
+</erl>

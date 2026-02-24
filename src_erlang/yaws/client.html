@@ -15,6 +15,7 @@
 	<div id="post"></div>
 	<h3>Test POST con parametri</h3>
 	<div id="post_parametri"></div>
+	<div id="post_method"></div>
 	<script src="utils.js">	</script>
 	<script>
 		// Test.
@@ -26,12 +27,16 @@
 		});
 		post("server.yaws").then((post_res) => {
 			document.getElementById("post").innerHTML = post_res.result;
+			const returnData2 = JSON.parse(post_res.result);
+			console.log( "Lunghezza array:" + returnData2.length);
+			console.log( returnData2);
 		});
 		
-		const utenti = [
-    { id: 1, nome: "Luca" },
-    { id: 2, nome: "Sara" }
-];
+		const utenti = 
+	[
+		{ id: 1, nome: "Luca" },
+		{ id: 2, nome: "Sara" }
+	];
 
 // Parametri: (oggetto, replacer, spazi)
 //const jsonBello = JSON.stringify(utenti, null, 4);
@@ -39,10 +44,12 @@ const jsonBello = JSON.stringify(utenti);
 
 console.log(jsonBello);
 
-		post("server.yaws", jsonBello).then((post_res) => {
-			document.getElementById("post_parametri").innerHTML = post_res.result;
-			const returnData = JSON.parse(post_res.result);
-			console.log( returnData[0].prova);
+		post("server.yaws", jsonBello).then((post_res2) => {
+			document.getElementById("post_parametri").innerHTML = post_res2.result;
+			document.getElementById("post_method").innerHTML = post_res2.method;
+			const returnData = JSON.parse(post_res2.result);
+			console.log( "Lunghezza array:" + returnData.length);
+			console.log( returnData[0].id);
 		});
 		/*
 */

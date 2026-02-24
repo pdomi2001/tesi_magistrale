@@ -5,8 +5,9 @@
 		case method(Arg) of
 			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"result\": ~p }", ["test get"]);
 
-			'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", ["[{\"prova\": \"valore\", \"prova2\": \"valore2\" }]"])
+			'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [get_data(Arg)])
 			%'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [Arg#arg.clidata])
+			%'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", ["[{\"prova\": \"valore\", \"prova2\": \"valore2\" }]"])
 			%'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", [rfc4627:decode("[{\"prova\": \"valore\"; \"prova2\": \"valore2\" }]")])
 			%'POST' ->	
 			%			data = Arg#arg.clidata, %rfc4627:decode(Arg#arg.clidata),
@@ -14,14 +15,97 @@
 		end
 	.
 	
-	method(Arg) ->  Rec = Arg#arg.req,   Rec#http_request.method. 
+	method(Arg) ->  
+		Rec = Arg#arg.req,   Rec#http_request.method
+		. 
 
-	get_data(Arg) ->  
+	processa_comandi('POST', Arg) ->
+		%Result = "risultato",
+		Parametri = #{
+			<<"title">> => <<"Arrivato messaggio in POST">>,
+			<<"method">> => <<"POST">>,
+			<<"result">> => get_data(Arg)
+		},
+		Result = json:encode(Parametri),
+		%Result = io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [get_data(Arg)]),
+		Result
+		;
+
+	processa_comandi('GET', _Arg) ->
+		%equivalente con le mappe di quello fatto fino ad ora
+		Parametri = #{
+			<<"title">> => <<"Arrivato messaggio in GET">>,
+			<<"method">> => <<"GET">>,
+			<<"result">> => <<"test_get">>
+		},
+		Result = json:encode(Parametri),
+		%Result = io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"result\": ~p }", ["test_get"]),
+		Result
+		;
+	
+	processa_comandi(Method, Arg) ->
+		Result = io_lib:format("Metodo non gestito: ~p", [Method]),
+		Result
+		.
+
+	get_data(Arg) ->
+		Clidata = Arg#arg.clidata,
+		{_, Parametri} = decode_Json(Clidata), 
+		%{ok, Jsondata, _} = rfc4627:decode(Clidata),
+		%Msgtype = rfc4627:get_field(Jsondata, "msg-type", <<>>),
+		%Result = io:format("~p", [Msg_Type]),
+		%Result = Clidata, %"test4",
+		Parametri
+		.
+
+	get_data2(Arg) ->  
 		{ok, Json, _}  = rfc4627:decode(Arg#arg.clidata),
-		io:format("~n~p:~p POST request ~p~n", [?MODULE, ?LINE, Json]).
+		io:format("~n~p:~p POST request ~p~n", [?MODULE, ?LINE, Json])
+		.
 
-	out(Arg) ->   
-		{ehtml, test_reply(Arg)}.
+	decode_Json(JsonRaw) ->
+		try
+			Mappa = json:decode(JsonRaw),
+			{ok, Mappa}
+		catch
+			error:Reason ->
+				io:format("Errore durante la decodifica JSON: ~p~n", [Reason]),
+				{error, json_malformato}
+		end
+		.
+%		case json:decode(JsonRaw) of
+%			{ok, {obj, Dati}, _} ->
+%				% Estraiamo un valore specifico (es. lo studente)
+%				%{ok, Studente} = rfc4627:get_field({obj, Dati}, "studente"),
+%				%{ok, Studente} = json:get_field({obj, Dati}, "studente"),
+%				#{<<"studente">> := Studente} = Dati,
+%				
+%				% Qui chiameresti il tuo "Gestore di messaggi" per salvare i dati
+%				%io:format("Ricevuti risultati per lo studente: ~p~n", [Studente]),
+%				
+%				% 4. Rispondiamo al client con un messaggio di successo
+%				Risposta = json:encode({obj, [{"status", "ok"}, {"msg", "Ricevuto!"}]}),
+%				{content, "application/json", Risposta};
+%
+%			{unexpected_byte, Byte, Position} ->
+%				% Gestione errore se il JSON è malformato
+%				{status, 400};
+%			{unexpected_end, Position} ->
+%				% Gestione errore se il JSON è malformato
+%				{status, 400};
+%			invalid_utf8 ->
+%				{status, 400}
+%		end	 		
+%		.
+
+	out(Arg) ->
+		Method = method(Arg),
+		Risultato = processa_comandi(Method, Arg),
+		%Risultato = "processa_comandi(Method, Arg)",
+		%{ehtml, Risultato}
+		{content, "application/json", Risultato}
+		.   
+		%{ehtml, test_reply(Arg)}.
 		%{ehtml, f("{\"title\": \"title\", \"method\": \"~p\" }", [method(Arg)])}.  
 		%msg_func:test_reply(Arg).
 		%{ehtml, f("{\"title\": \"title\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
