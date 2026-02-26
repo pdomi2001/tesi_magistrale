@@ -1,14 +1,18 @@
 let cache = {};
-const request = (url, params = {}, method = "GET") => {
+const request = (url, params = {}, method = "GET", customHeaders = {}) => {
   let cacheKey = JSON.stringify({ url, params, method });
   if (cache[cacheKey]) {
     return cache[cacheKey];
   }
 
+  // Definiamo le opzioni base inclusi gli headers
   let options = {
-    method
-  };
-  if ("GET" === method) {
+    method,
+    headers: {
+      "Content-Type": "application/json", // Default per API moderne
+      ...customHeaders
+    }
+  };  if ("GET" === method) {
     url += "?" + new URLSearchParams(params).toString();
   } else {
     options.body = JSON.stringify(params);
@@ -19,6 +23,6 @@ const request = (url, params = {}, method = "GET") => {
 
   return result;
 };
-const get = (url, params) => request(url, params, "GET");
-const post = (url, params) => request(url, params, "POST");
+const get = (url, params, headers) => request(url, params, "GET", headers);
+const post = (url, params, headers) => request(url, params, "POST", headers);
 

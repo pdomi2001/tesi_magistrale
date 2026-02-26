@@ -103,7 +103,19 @@
 		Risultato = processa_comandi(Method, Arg),
 		%Risultato = "processa_comandi(Method, Arg)",
 		%{ehtml, Risultato}
-		{content, "application/json", Risultato}
+		
+		%% Definiamo l'header CORS
+		% Sostituisci "*" con "https://tuosito.com" per maggiore sicurezza
+		ACAO = {header, {"Access-Control-Allow-Origin", "*"}},
+		
+		%% Altri header comuni per le API
+		ContentType = {header, {"Content-Type", "application/json"}},
+		% Torno gli header per evitare ACAO
+		[
+			ACAO,
+			ContentType,		
+			{content, "application/json", Risultato}
+		]
 		.   
 		%{ehtml, test_reply(Arg)}.
 		%{ehtml, f("{\"title\": \"title\", \"method\": \"~p\" }", [method(Arg)])}.  

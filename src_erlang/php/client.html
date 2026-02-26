@@ -18,21 +18,19 @@
 	<div id="post_method"></div>
 	<script src="utils.js">	</script>
 	<script>
+		server = "http://localhost:8080/server.yaws";
 		// Test.
 		/* get("https://jsonplaceholder.typicode.com/posts/1").then((post) => {
 			document.getElementById("app").innerHTML = post.title;
 		}); */
-		const headers = {
-  "Access-Control-Allow-Origin": "http://localhost"
-};
-		get("server.yaws", {}, headers).then((post) => {
+		get(server).then((post) => {
 			document.getElementById("get").innerHTML = post.result;
 		});
-		post("server.yaws", {}, headers).then((post_res) => {
+		post(server).then((post_res) => {
 			document.getElementById("post").innerHTML = post_res.result;
 			const returnData2 = JSON.parse(post_res.result);
 			console.log( "Lunghezza array:" + returnData2.length);
-			console.log(returnData2);
+			console.log( returnData2);
 		});
 		
 		const utenti = 
@@ -47,7 +45,7 @@ const jsonBello = JSON.stringify(utenti);
 
 console.log(jsonBello);
 
-		post("server.yaws", jsonBello, headers).then((post_res2) => {
+		post(server, jsonBello).then((post_res2) => {
 			document.getElementById("post_parametri").innerHTML = post_res2.result;
 			document.getElementById("post_method").innerHTML = post_res2.method;
 			const returnData = JSON.parse(post_res2.result);
