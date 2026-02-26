@@ -66,3 +66,8 @@ In particolare non sar\'a pi\'u direttamente il server a generare la pagina da v
 Questo approccio richiede che il client abbia un browser pi\'u moderno dato che una parte del processo viene spostata lato client. D'altro canto ormai tantissime applicazioni, come ad esempio Google mail o Facebook, hanno questo tipo di approccio.
 
 Gli scambi tra il client, il gestore di messaggi e il server PHP, avverranno quindi solo tramite messaggi codificati in JSON e non come pagine web intere. Questo ci permetter\'a, in ottica futura, di poter modificare una singola parte (client, server o gestore di messaggi) senza dover modificare obbligatoriamente le altre.
+
+\subsection{Configurazione}
+Per verificare il nostro progetto realizzeremo un server di test nel quale installeremo il server Yaws nel quale girer\'a il codice erlang ed anche una configurazione standard di apache, php, mysql (o mariadb) in modo da poter provare l'efficacia del nostro sistema.
+
+Implementeremo comunque, sia lato client, che lato server php, un set minimo di comandi sufficiente per provare la risposta del server php interrogato direttamente dal client html confrontato con la stessa configurazione ma con il gestore di messaggi inserito tra i due elementi.
