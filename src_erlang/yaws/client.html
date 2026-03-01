@@ -28,12 +28,14 @@
 		get("server.yaws", {}, headers).then((post) => {
 			document.getElementById("get").innerHTML = post.result;
 		});
+		/*
 		post("server.yaws", {}, headers).then((post_res) => {
 			document.getElementById("post").innerHTML = post_res.result;
 			const returnData2 = JSON.parse(post_res.result);
 			console.log( "Lunghezza array:" + returnData2.length);
 			console.log(returnData2);
 		});
+		*/
 		
 		const utenti = 
 	[

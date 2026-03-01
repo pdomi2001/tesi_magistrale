@@ -24,7 +24,8 @@
 		Parametri = #{
 			<<"title">> => <<"Arrivato messaggio in POST">>,
 			<<"method">> => <<"POST">>,
-			<<"result">> => get_data(Arg)
+			<<"result">> => get_data(Arg),
+			<<"risposta">> => process_data(Arg)
 		},
 		Result = json:encode(Parametri),
 		%Result = io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [get_data(Arg)]),
@@ -55,6 +56,27 @@
 		%Msgtype = rfc4627:get_field(Jsondata, "msg-type", <<>>),
 		%Result = io:format("~p", [Msg_Type]),
 		%Result = Clidata, %"test4",
+		Parametri
+		.
+
+	process_data(Arg) ->
+		Clidata = Arg#arg.clidata,
+		%{_, Parametri} = decode_Json(Clidata),
+		 
+		%{ok, Messaggio} = json:get_field(Parametri, "msg-type"),
+		%case Messaggio of
+		%	"test_messaggio" ->
+		%		Parametri = #{
+		%			<<"result-type">> => <<"test_result">>,
+		%			<<"result">> => <<"result successfull">>
+		%		},
+		%		Result = json:encode(Parametri),
+		%end,
+		Parametri = #{
+			<<"result-type">> => <<"test_result">>,
+			<<"result">> => <<"result successfull">>
+		},
+		%Result = json:encode(Parametri),
 		Parametri
 		.
 

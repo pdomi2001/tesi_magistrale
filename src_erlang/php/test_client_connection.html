@@ -1,0 +1,126 @@
+<html>
+<head>
+	<title>Client</title>
+</head>
+<body>
+	<h1>Client di prova per verificare la comunicazione automatica con il gestore di messaggi</h1>
+	
+	<p><a href="javascript:StartInvioMessaggi()">Inizia invio dei messaggi.</a></p>
+	<!-- 
+	<p><a href="">Registrazione postazione sulla piattaforma</a></p>
+	<p><a href="">De-Registrazione postazione sulla piattaforma</a></p>
+	-->
+
+	<h2>Test javascript</h2>
+	<h3>Test get</h3>
+	<div id="get"></div>
+<!--
+	<h3>Test POST</h3>
+	<div id="post"></div>
+-->
+	<h3>Test POST con parametri</h3>
+	<div id="post_parametri"></div>
+	<div id="post_method"></div>
+	<div style="border: 1px solid black;" id="return_message"></div>
+	<script src="utils.js">	</script>
+	<script>		
+	server = "http://localhost:8080/server.yaws"; /* variabile che memorizza il timer */
+
+	var t_invio_messaggi;
+	var invio_messaggi_refresh_time_first_time = 1 * 1000; /* x secondi */
+	var invio_messaggi_refresh_time = 10 * 1000; /* x secondi */
+	var numero_iterazioni = 0;
+
+	/* function StartInvioMessaggi(webpage, session_id) { */
+	function StartInvioMessaggi() {
+		clearTimeout(t_invio_messaggi);
+		/*
+		keepalive_webpage = webpage;
+		keepalive_session_id = session_id;
+		*/
+
+		t_invio_messaggi = setTimeout('InvioMessaggi()', invio_messaggi_refresh_time_first_time); 
+	}
+	/* mantieni viva la sessione */
+	function InvioMessaggi()
+	{
+	  /* var url = keepalive_webpage + "?phpsessid="+ keepalive_session_id; */
+
+	  /* callbackvar = ""; */
+	  /* HTTP.getText(url, SetCallbackVar); */
+	  /* HTTP.getText(url, Keepalive_callback); */
+	  /* return callbackvar; */
+		const dati = 
+	[
+		{ 
+			"msg-type": "test_messaggio", 
+			"numero_iterazioni": numero_iterazioni, 
+			"nome": "Sara" }
+	];
+/*	[
+		{ 
+			iterazione: numero_iterazioni ,
+			msg-type: "test_messaggio"
+		}
+	];
+*/
+	numero_iterazioni = numero_iterazioni + 1;
+		const jsonBello = JSON.stringify(dati);
+
+		console.log(jsonBello);
+
+		post(server, jsonBello).then((post_res) => {
+			document.getElementById("post_parametri").innerHTML = post_res.result;
+			document.getElementById("post_method").innerHTML = post_res.method;
+			document.getElementById("return_message").innerHTML = post_res.risposta.result;
+			console.log("post_res :" + post_res.risposta.result);
+			/*
+			const returnData = JSON.parse(post_res.risposta);
+			console.log( "Lunghezza array:" + returnData.length);
+			console.log( returnData[0].risposta);
+			*/
+		});
+
+
+
+	  /* faccio ripartire il timer per la prossima iterazione */
+  	  t_invio_messaggi = setTimeout('InvioMessaggi()', invio_messaggi_refresh_time); 
+	}
+
+	
+
+		
+		get(server).then((post) => {
+			document.getElementById("get").innerHTML = post.result;
+		});
+		/*
+		post(server).then((post_res) => {
+			document.getElementById("post").innerHTML = post_res.result;
+			const returnData2 = JSON.parse(post_res.result);
+			console.log( "Lunghezza array:" + returnData2.length);
+			console.log( returnData2);
+		});
+		
+		const utenti = 
+	[
+		{ id: 1, nome: "Luca" },
+		{ id: 2, nome: "Sara" }
+	];
+
+// Parametri: (oggetto, replacer, spazi)
+//const jsonBello = JSON.stringify(utenti, null, 4);
+const jsonBello = JSON.stringify(utenti);
+
+console.log(jsonBello);
+
+		post(server, jsonBello).then((post_res2) => {
+			document.getElementById("post_parametri").innerHTML = post_res2.result;
+			document.getElementById("post_method").innerHTML = post_res2.method;
+			const returnData = JSON.parse(post_res2.result);
+			console.log( "Lunghezza array:" + returnData.length);
+			console.log( returnData[0].id);
+		});
+*/
+	</script>
+</body>
+</html>
