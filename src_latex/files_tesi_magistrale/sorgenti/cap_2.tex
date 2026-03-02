@@ -23,6 +23,33 @@ Per avere un riferimento stiliamo innanzitutto un elenco dei messaggi che potreb
 Per poter poter comunicare sia lato client che lato server, visto che le comunicazioni avvengono gi\'a su http o https non useremo erlang direttamente ma ci affideremo al web server Yaws \cite{web:yaws} che \'e stato implentato proprio in Erlang e che permette di inserire all'interno del codice html, in modo simile a php, direttamente chiamate a codice erlang.
 Saremo costretti ad adattare il codice del client e del server in modo che comunichino attraverso il nuovo gestore dei messaggi.
 
+\section{Differenze tra le due modalit\'a}
+La differenza principale, nella comunicazione tra client e server \'e che nella configurazione originale, senza il gestore dei messaggi, ogni richiesta del client viene gestita direttamente dal server che risponde, nella stessa connessione, con la pagina o il messaggio relativo.
+
+\begin{figure}[!hbtp]
+	\includegraphics[width=1.0\textwidth]{figure/Disegno 003_ Esempio comunicazione senza gestore messaggi.png}
+	\caption{Esempio comunicazione senza gestore messaggi}
+	\label{fig:Esempio_comunicazione_senza_gestore_messaggi}
+\end{figure}
+
+Nella configurazione con il gestore dei messaggi invece la comunicazione avviene in modo asincrono. Il client fa una richiesta al gestore dei messaggi, questo risponde nella stessa comunicazione con l'ID con il quale la richiesta \'e stata memorizzata nella coda dei messaggi in modo che il client possa sapere quando la richiesta \'e stata processata.
+
+Ad intervalli regolari il client far\'a una richiesta al gestore dei messaggi per sapere l'esito della sua richiesta.
+
+La comunicazione tra gestore dei messaggi e server php la comunicazione avverr\'a in modo simile.
+Il gestore dei messaggi prender\'a uno dei messaggi dalla coda e si colleger\'a al server php. Per evitare le congestioni implementeremo un sistema che limiti il numero di processi contemporanei attivi. Se tutte le connessioni che abbiamo deciso fossero gi\'a occupate il gestore di messaggi metter\'a il messaggio di nuovo nella coda ed attendender\'a un tempo variabile prima di tentare nuovamente.
+
+Se la connessione va a buon fine il server php ci risponder\'a con il risultato della richiesta. Questa verr\'a nuovamente memorizzata nella coda dei messaggi di risposta per essere inviata al client corrispondente all'ID della richiesta originale.
+
+Nel caso della comunicazione con il server avremo una comunicazione sincrona anzich\'e asincrona.
+
+\begin{figure}[!hbtp]
+	\includegraphics[width=1.0\textwidth]{figure/Disegno 004_ Esempio comunicazione con gestore messaggi}
+	\caption{Esempio comunicazione con gestore messaggi}
+	\label{fig:Esempio_comunicazione_con_gestore_messaggi}
+\end{figure}
+
+
 \section{Diagrammi degli stati}
 Per comprendere meglio quali sono i messaggi che saranno necessari per la comunicazione con il server useremo dei diagrammi degli stati.
 

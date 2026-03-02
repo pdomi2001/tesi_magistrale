@@ -15,7 +15,56 @@ Nella seconda fase il gestore di messaggi, comunicher\'a con web server PHP. Per
 \section{Comunicazione tra client e gestore dei messaggi}
 Visto che il client gira su un browser la comunicazioni verr\'a gestita tramite codice Javascript. La comunicazione avverr\'a usando REST.
 
+Utilizziamo per questo come base per la comunicazione alcune funzioni javascript:
+\begin{verbatim}
+let cache = {};
+const request = (url, params = {}, method = "GET", customHeaders = {}) => {
+	let cacheKey = JSON.stringify({ url, params, method });
+	if (cache[cacheKey]) {
+		return cache[cacheKey];
+	}
+	
+	// Definiamo le opzioni base inclusi gli headers
+	let options = {
+		method,
+		headers: {
+			"Content-Type": "application/json", // Default per API moderne
+			...customHeaders
+		}
+	};  if ("GET" === method) {
+		url += "?" + new URLSearchParams(params).toString();
+	} else {
+		options.body = JSON.stringify(params);
+	}
+	
+	const result = fetch(url, options).then((response) => response.json());
+	cache[cacheKey] = result;
+	
+	return result;
+};
+const get = (url, params, headers) => request(url, params, "GET", headers);
+const post = (url, params, headers) => request(url, params, "POST", headers);
 
+\end{verbatim}
+per passare i parametri al gestore dei messaggi metteremo i valori in un array
+\begin{verbatim}
+	const utenti = 
+	[
+	{ id: 1, nome: "Luca" },
+	{ id: 2, nome: "Sara" }
+	];
+\end{verbatim}
+e poi li convertiremo in json
+\begin{verbatim}
+	const json = JSON.stringify(utenti);
+\end{verbatim}
+infine invocheremo la funzione per inviare i dati e leggere il risultato della elaborazione
+\begin{verbatim}
+post("server.yaws", jsonBello, headers).then((post_res) => {
+		const returnData = JSON.parse(post_res.result);
+	});	
+\end{verbatim}
+Il contenuto di risultato dipenderà logicamente dal
 
 
 

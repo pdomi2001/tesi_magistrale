@@ -2,17 +2,35 @@
 La comunicazione tra il client, il gestore dei messaggi e il server avvengono attraverso strutture json.
 \section{Struttura JSON}
 La struttura JSON che viene inviata per la comunicazione tra i vari elementi dovr\'a avere uno schema del tipo:
-\begin{itemize}
-\item tipo-messaggio: msg-type
+\begin{verbatim}
+{
+  msg_type: tipo_messaggio,
+  msg_content: contenuto_del_messaggio
+}
+\end{verbatim}
 
-		contenuto: contenuto-del-messaggio
-\end{itemize}
+I messaggi di ritorno avranno una struttura del tipo:
 
-I tipi di messaggio da gestire saranno:
-\begin{itemize}
-	\item tipo-messaggio: msg-type
-	
-	contenuto: contenuto-del-messaggio
-\end{itemize}
+\begin{verbatim}
+{
+  result_type: tipo_messaggio_di_ritorno,
+  result_content: contenuto_del_messaggio
+}
+\end{verbatim}
 
+Codifichiamo quindi i messaggi per il gestore dei messaggi:
+
+\begin{tabular}{|c|l|}
+	\hline
+	test\_messaggio & Serve per fare un semplice test di comunicazione\\
+	\hline
+	register\_station & Indica al sistema che la postazione vuole essere registrata sul sistema \\
+	\hline
+	unregister\_station & Indica al sistema che la postazione vuole essere tolta dal sistema \\
+    \hline
+	request\_code & Indica al sistema che la postazione vuole essere registrata sul sistema \\
+    \hline
+	register\_station & Indica al sistema che la postazione vuole essere registrata sul sistema \\
+    \hline
+\end{tabular}
 

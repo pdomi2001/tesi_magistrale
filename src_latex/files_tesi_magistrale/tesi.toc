@@ -12,16 +12,17 @@
 \contentsline {section}{\numberline {2.1}Comunicazione}{5}{}%
 \contentsline {subsection}{\numberline {2.1.1}Esempi di messaggi che possono essere utilizzati}{5}{}%
 \contentsline {subsection}{\numberline {2.1.2}Requisiti tecnici}{6}{}%
-\contentsline {section}{\numberline {2.2}Diagrammi degli stati}{6}{}%
-\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{7}{}%
-\contentsline {section}{\numberline {3.1}Struttura JSON}{7}{}%
-\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{8}{}%
-\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{8}{}%
-\contentsline {section}{\numberline {4.2}Comunicazione tra gestore dei messaggi e server PHP}{8}{}%
-\contentsline {subsection}{\numberline {4.2.1}Ricezione dei messaggi in PHP}{8}{}%
-\contentsline {subsection}{\numberline {4.2.2}Implementazione del codice per limitare le connessioni}{9}{}%
-\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{11}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{12}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{13}{}%
-\contentsline {chapter}{Bibliografia}{14}{}%
-\contentsline {chapter}{Ringraziamenti}{15}{}%
+\contentsline {section}{\numberline {2.2}Differenze tra le due modalit\'a}{6}{}%
+\contentsline {section}{\numberline {2.3}Diagrammi degli stati}{7}{}%
+\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{9}{}%
+\contentsline {section}{\numberline {3.1}Struttura JSON}{9}{}%
+\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{10}{}%
+\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{10}{}%
+\contentsline {section}{\numberline {4.2}Comunicazione tra gestore dei messaggi e server PHP}{11}{}%
+\contentsline {subsection}{\numberline {4.2.1}Ricezione dei messaggi in PHP}{11}{}%
+\contentsline {subsection}{\numberline {4.2.2}Implementazione del codice per limitare le connessioni}{12}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{14}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{15}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{16}{}%
+\contentsline {chapter}{Bibliografia}{17}{}%
+\contentsline {chapter}{Ringraziamenti}{18}{}%
