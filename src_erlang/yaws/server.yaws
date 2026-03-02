@@ -24,8 +24,18 @@
 		Parametri = #{
 			<<"title">> => <<"Arrivato messaggio in POST">>,
 			<<"method">> => <<"POST">>,
-			<<"result">> => get_data(Arg),
-			<<"risposta">> => process_data(Arg)
+			<<"result">> => 
+				try 
+					get_data(Arg)
+				catch
+					_:_ -> <<"result_error">>
+				end,
+			<<"risposta">> => 
+				try 
+					process_data(Arg)
+				catch
+					_:_ -> <<"process_data_error">>
+				end
 		},
 		Result = json:encode(Parametri),
 		%Result = io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [get_data(Arg)]),
@@ -61,21 +71,38 @@
 
 	process_data(Arg) ->
 		Clidata = Arg#arg.clidata,
-		%{_, Parametri} = decode_Json(Clidata),
+		{_, Parametri_in} = decode_Json(Clidata),
 		 
-		%{ok, Messaggio} = json:get_field(Parametri, "msg-type"),
-		%case Messaggio of
-		%	"test_messaggio" ->
-		%		Parametri = #{
-		%			<<"result-type">> => <<"test_result">>,
-		%			<<"result">> => <<"result successfull">>
-		%		},
-		%		Result = json:encode(Parametri),
-		%end,
-		Parametri = #{
-			<<"result-type">> => <<"test_result">>,
-			<<"result">> => <<"result successfull">>
-		},
+		%{ok, Messaggio2} = json:get_field(Parametri_in, "msg-type"),
+		% Estraiamo il campo 'studente' in una variabile
+		#{<<"msg_type">> := Messaggio} = Parametri_in,
+		%Messaggio = list_to_binary(json:encode(Parametri_in)),
+		case Messaggio of
+			<<"test_messaggio">> ->
+				Parametri = #{
+					<<"result-type">> => <<"test_result">>,
+					<<"result">> => <<"result successfull">>
+				};
+			<<"registra_postazione">> ->
+				Parametri = #{
+					<<"result-type">> => <<"registration_result">>,
+					<<"result">> => <<"registration successfull">>
+				};
+				%Result = json:encode(Parametri),
+			_ -> 
+				Parametri = #{
+					<<"result-type">> => <<"not_found">>,
+					<<"result">> => Messaggio
+				}
+		end,
+		%Messaggio = <<"messaggio2a">>,
+		%Parametri = #{
+		%	<<"result-type">> => <<"test_result">>,
+		%	<<"result">> => <<"result successfull">>,
+		%	<<"msg_arrived_numelements">> => maps:size(Parametri_in),
+		%	%<<"msg_arrived_numelements">> => is_map(Parametri_in),
+		%	<<"msg_arrived">> => Messaggio
+		%},
 		%Result = json:encode(Parametri),
 		Parametri
 		.
@@ -122,7 +149,14 @@
 
 	out(Arg) ->
 		Method = method(Arg),
-		Risultato = processa_comandi(Method, Arg),
+		Risultato = try
+			processa_comandi(Method, Arg)
+		catch
+			_ -> json:encode(#{
+			<<"title">> => <<"Arrivato messaggio in POST">>,
+			<<"method">> => <<"POST">>
+		})
+		end,
 		%Risultato = "processa_comandi(Method, Arg)",
 		%{ehtml, Risultato}
 		
@@ -131,11 +165,11 @@
 		ACAO = {header, {"Access-Control-Allow-Origin", "*"}},
 		
 		%% Altri header comuni per le API
-		ContentType = {header, {"Content-Type", "application/json"}},
+		%ContentType = {header, {"Content-Type", "application/json"}},
 		% Torno gli header per evitare ACAO
 		[
 			ACAO,
-			ContentType,		
+			%ContentType,		
 			{content, "application/json", Risultato}
 		]
 		.   

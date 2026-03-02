@@ -9,18 +9,20 @@
 	<!-- 
 	<p><a href="">Registrazione postazione sulla piattaforma</a></p>
 	<p><a href="">De-Registrazione postazione sulla piattaforma</a></p>
-	-->
 
 	<h2>Test javascript</h2>
-	<h3>Test get</h3>
-	<div id="get"></div>
+	-->
+	<p>Test get: <span id="get"></span></p>
+	
 <!--
 	<h3>Test POST</h3>
 	<div id="post"></div>
 -->
-	<h3>Test POST con parametri</h3>
-	<div id="post_parametri"></div>
+	<div>Test POST con parametri: <span id="post_parametri"></span></div>
+<!--
+	<div id="post_parametri_"></div>
 	<div id="post_method"></div>
+-->
 	<div style="border: 1px solid black;" id="return_message"></div>
 	<script src="utils.js">	</script>
 	<script>		
@@ -51,12 +53,12 @@
 	  /* HTTP.getText(url, Keepalive_callback); */
 	  /* return callbackvar; */
 		const dati = 
-	[
+	
 		{ 
-			"msg-type": "test_messaggio", 
+			"msg_type": "test_messaggio", 
 			"numero_iterazioni": numero_iterazioni, 
-			"nome": "Sara" }
-	];
+			"test": "Sara" }
+	;
 /*	[
 		{ 
 			iterazione: numero_iterazioni ,
@@ -71,8 +73,10 @@
 
 		post(server, jsonBello).then((post_res) => {
 			document.getElementById("post_parametri").innerHTML = post_res.result;
-			document.getElementById("post_method").innerHTML = post_res.method;
+			/* document.getElementById("post_method").innerHTML = post_res.method; */
 			document.getElementById("return_message").innerHTML = post_res.risposta.result;
+			console.log("risposta:" + post_res.risposta);
+			console.log("msg-arrived:" + post_res.risposta.msg_arrived);
 			console.log("post_res :" + post_res.risposta.result);
 			/*
 			const returnData = JSON.parse(post_res.risposta);
