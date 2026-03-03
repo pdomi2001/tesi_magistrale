@@ -32,7 +32,7 @@
 				end,
 			<<"risposta">> => 
 				try 
-					process_data(Arg)
+					process_data_2(Arg)
 				catch
 					_:_ -> <<"process_data_error">>
 				end
@@ -69,30 +69,101 @@
 		Parametri
 		.
 
-	process_data(Arg) ->
+	process_data_2(Arg) ->
 		Clidata = Arg#arg.clidata,
-		{_, Parametri_in} = decode_Json(Clidata),
-		 
-		%{ok, Messaggio2} = json:get_field(Parametri_in, "msg-type"),
-		% Estraiamo il campo 'studente' in una variabile
-		#{<<"msg_type">> := Messaggio} = Parametri_in,
-		%Messaggio = list_to_binary(json:encode(Parametri_in)),
-		case Messaggio of
+		Parametri__ =
+		#{	<<"msg_type">> => <<"test_messaggio">>,
+			<<"numero_iterazioni">> => 1,
+			<<"test">> => <<"Sara">>},
+		Parametri =
+			try 
+				json:decode(Clidata)
+			catch
+				_:_ -> #{<<"msg_type">> => <<"decode_json_problem">>} 
+			end,
+%		ParametriTuple = yaws_api:parse_post(Arg),
+%		Parametri___ = maps:from_list(ParametriTuple),
+		%TipoMessaggio = maps:get(<<"test">>, Parametri, <<"default_value">>),
+		TipoMessaggio = try 
+			#{<<"msg_type">> := M} = Parametri,
+			%#{<<"test">> := M} = Parametri,
+			M  %% Se il match riesce, Messaggio diventerà il valore di M
+		catch 
+			error:{badmatch, _} ->
+				%list_to_binary("tipo_sconosciuto: is_map: " ++ Clidata)
+				%list_to_binary("tipo_sconosciuto: is_map: " ++ atom_to_binary(is_map(Parametri), utf8) ++ Clidata)
+				%list_to_binary("tipo_sconosciuto: " ++ Parametri ++ "is_map: "++ is_map(Parametri))
+				%list_to_binary("tipo_sconosciuto: is_map: " ++ is_map(Parametri))
+				<<"tipo_sconosciuto">> %% Valore di default se la chiave manca
+		end,
+		case TipoMessaggio of
 			<<"test_messaggio">> ->
-				Parametri = #{
+				Parametri_res = #{
 					<<"result-type">> => <<"test_result">>,
 					<<"result">> => <<"result successfull">>
 				};
 			<<"registra_postazione">> ->
-				Parametri = #{
+				Parametri_res = #{
 					<<"result-type">> => <<"registration_result">>,
 					<<"result">> => <<"registration successfull">>
 				};
 				%Result = json:encode(Parametri),
 			_ -> 
-				Parametri = #{
+				Parametri_res = #{
 					<<"result-type">> => <<"not_found">>,
-					<<"result">> => Messaggio
+					<<"result">> => TipoMessaggio
+				}
+		end,
+		Parametri_res
+		.	
+			
+	process_data(Arg) ->
+		Clidata = iolist_to_binary(Arg#arg.clidata),
+%		{_, Parametri_} = 
+%			try 
+%				decode_Json(Clidata)
+%			catch
+%				_:_ -> { error, <<"decode_json_problem">> }
+%			end,
+		Parametri =
+			try 
+				json:decode(Clidata)
+			catch
+				_:_ -> #{<<"msg_type">> => <<"decode_json_problem">>} 
+			end,
+		
+		%{ok, Messaggio2} = json:get_field(Parametri_in, "msg-type"),
+		Tipo_Messaggio = maps:get(<<"msg_type">>, Parametri, <<"default_value">>),
+		% Estraiamo il campo 'studente' in una variabile
+%		Tipo_Messaggio = try 
+%			%#{<<"msg_type">> := M} = Parametri,
+%			#{<<"test">> := M} = Parametri,
+%			M  %% Se il match riesce, Messaggio diventerà il valore di M
+%		catch 
+%			error:{badmatch, _} ->
+%				list_to_binary("tipo_sconosciuto: " ++ json:encode(Parametri))
+%				%<<"tipo_sconosciuto">> %% Valore di default se la chiave manca
+%		end,
+		%#{<<"msg_type">> := Tipo_Messaggio_2} = Parametri,
+		%Messaggio = list_to_binary(json:encode(Parametri_in)),
+		%Tipo_Messaggio = list_to_binary(json:encode(Tipo_Messaggio_2)),
+		%Tipo_Messaggio = <<"test_messaggio">>,
+		case Tipo_Messaggio of
+			<<"test_messaggio">> ->
+				Parametri_res = #{
+					<<"result-type">> => <<"test_result">>,
+					<<"result">> => <<"result successfull">>
+				};
+			<<"registra_postazione">> ->
+				Parametri_res = #{
+					<<"result-type">> => <<"registration_result">>,
+					<<"result">> => <<"registration successfull">>
+				};
+				%Result = json:encode(Parametri),
+			_ -> 
+				Parametri_res = #{
+					<<"result-type">> => <<"not_found">>,
+					<<"result">> => Tipo_Messaggio
 				}
 		end,
 		%Messaggio = <<"messaggio2a">>,
@@ -104,7 +175,7 @@
 		%	<<"msg_arrived">> => Messaggio
 		%},
 		%Result = json:encode(Parametri),
-		Parametri
+		Parametri_res
 		.
 
 	get_data2(Arg) ->  
@@ -113,14 +184,16 @@
 		.
 
 	decode_Json(JsonRaw) ->
+		Mappa = 
 		try
-			Mappa = json:decode(JsonRaw),
-			{ok, Mappa}
+			json:decode(JsonRaw)
 		catch
-			error:Reason ->
-				io:format("Errore durante la decodifica JSON: ~p~n", [Reason]),
-				{error, json_malformato}
-		end
+			%error:Reason ->
+				%io:format("Errore durante la decodifica JSON: ~p~n", [Reason]),
+				%{error, #{<<"errore">> => <<"json_malformato">>} }
+			_:_ -> #{<<"msg_type">> => <<"errore">>}
+		end,
+		{ok, Mappa}
 		.
 %		case json:decode(JsonRaw) of
 %			{ok, {obj, Dati}, _} ->
