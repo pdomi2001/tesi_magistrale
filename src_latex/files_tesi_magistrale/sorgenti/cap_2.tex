@@ -58,3 +58,28 @@ Per comprendere meglio quali sono i messaggi che saranno necessari per la comuni
 	\caption{Diagramma degli stati del Client}
 	\label{fig:diagramma_stati_client}
 \end{figure}
+
+Sul client, per l'esecuzione di un test la sequenza delle operazioni che questo dovr\'a eseguire \'e la seguente:
+
+\begin{enumerate}
+	\item Registrazione postazione sul server PHP*
+	\item Inserimento del codice della prova da svolgere nella pagina web da parte dell'utente
+	\item Invio richiesta dati del test in base al codice inserito*
+	\begin{itemize}
+		\item Se il codice non \'e corretto scrivo Codice non corretto e lo faccio inserire di nuovo
+		\item Se il codice \'e corretto usa i dati ricevuti dal server per creare dinamicamente la pagina web in base alle caratteristiche del test
+	\end{itemize}
+	\item Avvio i timer per lo svolgimento del test 
+	\begin{itemize}
+		\item Invio dello stato temporaneo del test (ogni 30s)*
+		\item Controllo se ci sono messaggi o azioni richieste dal server ( interruzione test, messaggio a video, ecc.)*
+	\end{itemize}
+	\item Consegna test definivo*
+	\begin{itemize}
+		\item Consegna manuale prima della scadenza
+		\item Consegna per scadenza del tempo
+	\end{itemize}
+	\item Cancellazione registrazione della postazione*
+\end{enumerate}
+* vuol dire che c'\'e una richiesta HTTP
+

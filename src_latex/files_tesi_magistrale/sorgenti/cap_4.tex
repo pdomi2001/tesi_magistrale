@@ -13,34 +13,35 @@ Nella prima il client comunicher\'a con il gestore del messaggi attraverso sempl
 Nella seconda fase il gestore di messaggi, comunicher\'a con web server PHP. Per evitare che si ripresenti lo stesso problema che avevamo con troppi client implementeremo una procedura che permetta solo un numero massimo di connessioni contemporanee. Sar\'a il gestore dei messaggi a permettere a tutti i client di collegarsi contemporaneamente e ad inviare i messaggi ricevuti al server al ritmo che il server accetta.
 
 \section{Comunicazione tra client e gestore dei messaggi}
+\subsection{Lato client Javascript}
 Visto che il client gira su un browser la comunicazioni verr\'a gestita tramite codice Javascript. La comunicazione avverr\'a usando REST.
 
 Utilizziamo per questo come base per la comunicazione alcune funzioni javascript:
 \begin{verbatim}
 let cache = {};
 const request = (url, params = {}, method = "GET", customHeaders = {}) => {
-	let cacheKey = JSON.stringify({ url, params, method });
-	if (cache[cacheKey]) {
-		return cache[cacheKey];
-	}
-	
-	// Definiamo le opzioni base inclusi gli headers
-	let options = {
-		method,
-		headers: {
-			"Content-Type": "application/json", // Default per API moderne
-			...customHeaders
-		}
-	};  if ("GET" === method) {
-		url += "?" + new URLSearchParams(params).toString();
-	} else {
-		options.body = JSON.stringify(params);
-	}
-	
-	const result = fetch(url, options).then((response) => response.json());
-	cache[cacheKey] = result;
-	
-	return result;
+    let cacheKey = JSON.stringify({ url, params, method });
+    if (cache[cacheKey]) {
+        return cache[cacheKey];
+    }
+    
+    // Definiamo le opzioni base inclusi gli headers
+    let options = {
+        method,
+        headers: {
+            "Content-Type": "application/json", // Default per API moderne
+            ...customHeaders
+        }
+    };  if ("GET" === method) {
+        url += "?" + new URLSearchParams(params).toString();
+    } else {
+        options.body = JSON.stringify(params);
+    }
+    
+    const result = fetch(url, options).then((response) => response.json());
+    cache[cacheKey] = result;
+    
+    return result;
 };
 const get = (url, params, headers) => request(url, params, "GET", headers);
 const post = (url, params, headers) => request(url, params, "POST", headers);
@@ -48,34 +49,134 @@ const post = (url, params, headers) => request(url, params, "POST", headers);
 \end{verbatim}
 per passare i parametri al gestore dei messaggi metteremo i valori in un array
 \begin{verbatim}
-	const utenti = 
-	[
-	{ id: 1, nome: "Luca" },
-	{ id: 2, nome: "Sara" }
-	];
+const dati = 
+{ 
+    "msg_type": "test_messaggio", 
+    "contenuto": "Contenuto messaggio" 
+};
 \end{verbatim}
 e poi li convertiremo in json
 \begin{verbatim}
-	const json = JSON.stringify(utenti);
+const json = JSON.stringify(dati);
 \end{verbatim}
 infine invocheremo la funzione per inviare i dati e leggere il risultato della elaborazione
 \begin{verbatim}
-post("server.yaws", jsonBello, headers).then((post_res) => {
-		const returnData = JSON.parse(post_res.result);
-	});	
+post("server.yaws", json, headers).then((post_res) => {
+        const result_type = post_res.risposta.result_type;
+        const risposta = post_res.risposta.result;
+    }); 
 \end{verbatim}
-Il contenuto di risultato dipenderà logicamente dal
+Il contenuto di risultato dipender\'a logicamente dal comando che avremo inviato pur avendo la struttura di base che abbiamo definito nel capitolo 3.
 
+\section{Lato gestore dei messaggi}
+Dal lato del gestore dei messaggi dovremo gestire le richieste fatte in json ed analizzare i dati che ci verranno inviati.
+Nel server Yaws la funzione che viene eseguita per prima \'e la funzione out().
+
+\begin{verbatim}
+out(Arg) ->
+    Method = method(Arg),
+    Risultato = try
+      processa_comandi(Method, Arg)
+    catch
+      _ -> json:encode(#{
+        <<"title">> => <<"Arrivato messaggio in POST">>,
+        <<"method">> => <<"POST">>
+    })
+    end,
+    
+    %% Definiamo l'header CORS
+    % Possiamo sostituire "*" con "https://tuosito.com" per maggiore sicurezza
+    ACAO = {header, {"Access-Control-Allow-Origin", "*"}},
+    
+    % Torno gli header per evitare ACAO
+    [
+      ACAO,
+      {content, "application/json", Risultato}
+    ]
+    .
+\end{verbatim} 
+
+Alla funzione vengono passati una serie di parametri inviati dal client. Questi parametri sono passati dentro alla varibile Arg che \'e un record e contiene diversi dati sulla connessione e sulla richiesta inviata al server web. Tra i pi\'u importanti troviamo:
+
+\subsubsection{Dati della Richiesta}
+\begin{itemize}
+    \item \textbf{Arg\#arg.clidata}: Contiene il corpo (body) della richiesta (es. dati POST o JSON).   
+    \item \textbf{Arg\#arg.req}: Contiene un altro record con i dettagli della riga di richiesta HTTP (metodo, percorso, versione).
+    \begin{itemize}
+        \item \textbf{Arg\#arg.req\#http\_request.method}: L'atomo del metodo (es. 'GET', 'POST').
+        \item \textbf{Arg\#arg.req\#http\_request.path}: Il percorso URL (es. {abs\_path, "/index.yaws"}).
+    \end{itemize}
+    \item \textbf{Arg\#arg.querydata}: Contiene la stringa dei parametri dopo il ? in un URL (es. in test.yaws?id=1, contiene "id=1").
+\end{itemize}
+
+I parametri che a noi interessano principalmente sono il metodo di connessioni (GET o POST) perch\'e i dati devono essere prelevati in modo differente, e le due variabili clidata per le chiamate in modalit\'a POST e querydata per le chiamate in modalit\'a GET.
+
+Vedremo meglio come gestire questa differenza pi\'u avanti.
+Nel codice sopra possiamo notare una sezione aggiuntiva che restituisce degli header aggiuntivi rispetto alla richiesta. Questi header si rendono necessari perch\'e i browser, per evitare che ci possano essere attacchi di tipo XSS (Cross Site Scripting) impediscono collegamenti javascript che siano diretti al di fuori del proprio collegamento.
+
+Nella nostra macchina di test, per poter eseguire contemporaneamente i server http PHP e YAWS abbiamo dovuto differenziare le porte per la connessione. Il server http PHP \'e stato impostato per lavorare sulla porta 80, mentre il server http yaws \'e stato impostato per lavorare sulla porta 8080.
+Avendo messo il client sulla porta 80, per il browser qualsiasi collegamento, compresi quelli sulla stessa macchina ma su una porta diversa, vengono visti come collegamenti esterni.
+
+Per ovviare a questo problema \'e necessario che il server conceda, tramite un parametro dell'header la possibilit\'a di accesso da un sito esterno. Per far questo aggiungiamo alla risposta "Access-Control-Allow-Origin" mettendo come sito autorizzato a collegarsi "*" che significa che tutti i siti possono accedere a lui.
+
+\subsection{Gestione delle diverse tipologie di connessione}
+La funzione processa\_comandi si occupa di differenziare la gestione dei messaggi in base alla tipologia di connessione.
+In questo momento ci concentreremo sui comandi in POST anche se implementeremo comunque anche la gestione di quelli in GET per poter fare dei test di connessione.
+
+Innanzitutto creeremo una mappa con i parametri da restituire indietro. I parametri principali saranno: title, method, result, risposta. 
+
+I primi due servono principalmente per verificare che la connessione funzioni, in \textit{result} metteremo gli stessi parametri inviati dal client, anche questi per verificare il corretto funzionamento, ed infine in \textit{risposta} ci sar\'a la struttura json con all'interno le informazioni che sono indirizzate al client.
+
+Cercheremo di intercettare eventuali problemi con la gestione dei parametri tramite l'utilizzo delle clausole try ... catch.
+
+La struttura dei dati verr\'a infine convertita in json per essere inviata indietro dal server tramite la funzione \textit{json:encode()}. Utilizziamo la libreria \textit{json} invece di quella proposta nel libro  su Yaws (\textit{rfc4627}) perch\'e quest'ultima necessita di installazione ed \'e obsoleta. Fortunatamente, a partire dalla versione \textit{\textbf{Erlang/OTP 27}} \'e stato integrata direttamente nel linguaggio la libreria json che essendo nativa \'e anche pi\'u veloce e ottimizzata.
+
+\begin{verbatim}
+processa_comandi('POST', Arg) ->
+    Parametri = #{
+        <<"title">> => <<"Arrivato messaggio in POST">>,
+        <<"method">> => <<"POST">>,
+        <<"result">> => 
+            try 
+              get_data(Arg)
+            catch
+              _:_ -> <<"result_error">>
+            end,
+        <<"risposta">> => 
+            try 
+              process_data(Arg)
+            catch
+              _:_ -> <<"process_data_error">>
+            end
+    },
+    Result = json:encode(Parametri),
+    Result;
+
+processa_comandi('GET', _Arg) ->
+    %equivalente con le mappe di quello fatto fino ad ora
+    Parametri = #{
+      <<"title">> => <<"Arrivato messaggio in GET">>,
+      <<"method">> => <<"GET">>,
+      <<"result">> => <<"test_get">>
+    },
+    Result = json:encode(Parametri),
+    Result; 
+
+    processa_comandi(Method, Arg) ->
+        Result = io_lib:format("Metodo non gestito: ~p", [Method]),
+        Result
+    .
+\end{verbatim}
 
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
-\subsection{Ricezione dei messaggi in PHP}
+\subsection{Limitazione del numero di connessioni al server PHP}
 Ci sono diversi metodi per limitare il numero connessioni che il server PHP accetta dal gestore dei messaggi. Alcuni dei pi\'u comuni sono:
 \begin{itemize}
-	\item Webhooks semplice (Push asincrono via HTTP)
-	\item Semaphore (Semafori a livello di Sistema Operativo) 
-	\item Gestione tramite il Web Server (Nginx / PHP-FPM)
-	\item Usare una tabella del database per gestire il numero di processi
+    \item Webhooks semplice (Push asincrono via HTTP)
+    \item Semaphore (Semafori a livello di Sistema Operativo) 
+    \item Gestione tramite il Web Server (Nginx / PHP-FPM)
+    \item Usare una tabella del database per gestire il numero di processi
 \end{itemize}
 
 Ognuno di questi ha dei vantaggi e degli svantaggi. Webhooks ad esempio ha il vantaggio che \'e il gestore dei messaggi ad inviare i messaggi ma rimane con lo stesso problema che abbiamo con la configurazione originale client/server; rischiamo infatti che il server di sovraccarichi.
@@ -85,7 +186,7 @@ La gestione del numero massimo di processi modificando la configurazione del web
 L'utilizzo di una tabella del nostro database mysql o mariadb per gestire il numero massimo di richieste in arrivo dal gestore dei messaggi sembra quindi essere la soluzione migliore.
 Non siamo legati al sistema operativo e non abbiamo bisogno di accedere alla configurazione di PHP. Il database \'e gi\'a installato per memorizzare i risultati delle prove svolte.
 
-\subsection{Implementazione del codice per limitare le connessioni}
+\subsubsection{Implementazione del codice per limitare le connessioni}
 Come gi\'a detto, per limitare le connessioni al server web PHP, implementeremo una gestione apposita. 
 
 Nel momento arriva una nuova connessione andremo a vedere, nella tabella delle connessioni attive, quante connessioni sono gi\'a in essere. Se il numero supera il numero massimo stabilito risponderemo alla chiamata con un messaggio che indichi il sovraccarico. In caso contrario aggiungeremo alla tabella un elemento ed eseguiremo il comando che ci \'e stato richiesto. Al termine del comando cancelleremo dalla tabella la riga corrispondente.
@@ -108,8 +209,8 @@ Creiamo quindi il codice per controllare se ci sono ancora slot disponibili:
 \begin{verbatim}
 function GetMaxSlots() {
   return 10;
-}	
-	
+}   
+    
 function SlotIsFree($db) {
   // Pulizia automatica (probabilita' 5% per ogni chiamata)
   if (rand(1, 100) <= 5) {
@@ -140,14 +241,14 @@ function LockSlot($db) {
   $stmt->execute([$token]);
   $mio_id = $db->lastInsertId();
   
-  return $mio_id;	
-}	
+  return $mio_id;   
+}   
 
 function UnLockSlot($db, $mio_id) {
   if (isset($mio_id)) {
     $db->prepare("DELETE FROM processi_attivi WHERE id = ?")->execute([$mio_id]);
   }
-}	
+}   
 
 \end{verbatim}
 
