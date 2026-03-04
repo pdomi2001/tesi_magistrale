@@ -30,7 +30,7 @@
 
 	var t_invio_messaggi;
 	var invio_messaggi_refresh_time_first_time = 1 * 1000; /* x secondi */
-	var invio_messaggi_refresh_time = 5 * 1000; /* x secondi */
+	var invio_messaggi_refresh_time = 10 * 1000; /* x secondi */
 	var numero_iterazioni = 0;
 
 	/* function StartInvioMessaggi(webpage, session_id) { */
@@ -54,7 +54,7 @@
 	  /* return callbackvar; */
 		const dati = 
 		{ 
-			"msg_type": "test_messaggio", 
+			msg_type: "test_messaggio", 
 			"numero_iterazioni": numero_iterazioni, 
 			"test": "Sara" 
 		};
@@ -65,26 +65,14 @@
 		}
 	];
 */
-		const jsonBello2 = "{\"msg_type\":\"test_messaggio\",\"numero_iterazioni\":" + numero_iterazioni + ",\"test\":\"Sara\"}";
 		numero_iterazioni = numero_iterazioni + 1;
-		const jsonBello = JSON.stringify(dati);
+		/* const jsonBello = JSON.stringify(dati); */
 
-		console.log(jsonBello);
-		console.log(jsonBello2);
-		console.log("confronto: " + (jsonBello == jsonBello2));
-
-		post(server, jsonBello2).then((post_res) => {
-			document.getElementById("post_parametri").innerHTML = post_res.result;
-			/* document.getElementById("post_method").innerHTML = post_res.method; */
+		post(server, dati).then((post_res) => {
+			document.getElementById("post_parametri").innerHTML = post_res.risposta.result_type;
 			document.getElementById("return_message").innerHTML = post_res.risposta.result;
-			console.log("risposta:" + post_res.risposta);
-			console.log("msg-arrived:" + post_res.risposta.msg_arrived);
+			console.log("msg-arrived:" + post_res.risposta.result_type);
 			console.log("post_res :" + post_res.risposta.result);
-			/*
-			const returnData = JSON.parse(post_res.risposta);
-			console.log( "Lunghezza array:" + returnData.length);
-			console.log( returnData[0].risposta);
-			*/
 		});
 
 

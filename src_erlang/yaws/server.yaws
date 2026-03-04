@@ -32,7 +32,7 @@
 				end,
 			<<"risposta">> => 
 				try 
-					process_data_2(Arg)
+					process_data(Arg)
 				catch
 					_:_ -> <<"process_data_error">>
 				end
@@ -60,6 +60,14 @@
 		.
 
 	get_data(Arg) ->
+		Clidata = iolist_to_binary(Arg#arg.clidata),
+		case json:decode(Clidata) of
+			List when is_list(List) -> List;
+			Map when is_map(Map) -> Map;
+			_ -> #{<<"error">> => <<"formato_sconosciuto">>}
+		end.	
+
+    get_data_2(Arg) ->
 		Clidata = Arg#arg.clidata,
 		{_, Parametri} = decode_Json(Clidata), 
 		%{ok, Jsondata, _} = rfc4627:decode(Clidata),
@@ -118,6 +126,7 @@
 		.	
 			
 	process_data(Arg) ->
+		%Clidata = get_data(Arg),
 		Clidata = iolist_to_binary(Arg#arg.clidata),
 %		{_, Parametri_} = 
 %			try 
@@ -151,18 +160,18 @@
 		case Tipo_Messaggio of
 			<<"test_messaggio">> ->
 				Parametri_res = #{
-					<<"result-type">> => <<"test_result">>,
+					<<"result_type">> => <<"test_result">>,
 					<<"result">> => <<"result successfull">>
 				};
 			<<"registra_postazione">> ->
 				Parametri_res = #{
-					<<"result-type">> => <<"registration_result">>,
+					<<"result_type">> => <<"registration_result">>,
 					<<"result">> => <<"registration successfull">>
 				};
 				%Result = json:encode(Parametri),
 			_ -> 
 				Parametri_res = #{
-					<<"result-type">> => <<"not_found">>,
+					<<"result_type">> => <<"not_found">>,
 					<<"result">> => Tipo_Messaggio
 				}
 		end,
@@ -238,11 +247,11 @@
 		ACAO = {header, {"Access-Control-Allow-Origin", "*"}},
 		
 		%% Altri header comuni per le API
-		%ContentType = {header, {"Content-Type", "application/json"}},
+		ContentType = {header, {"Content-Type", "application/json"}},
 		% Torno gli header per evitare ACAO
 		[
 			ACAO,
-			%ContentType,		
+			ContentType,		
 			{content, "application/json", Risultato}
 		]
 		.   

@@ -11,7 +11,8 @@ const request = (url, params = {}, method = "GET") => {
   if ("GET" === method) {
     url += "?" + new URLSearchParams(params).toString();
   } else {
-    options.body = JSON.stringify(params);
+    /* options.body = JSON.stringify(params); */
+    options.body = typeof params === "string" ? params : JSON.stringify(params);
   }
 
   const result = fetch(url, options).then((response) => response.json());
