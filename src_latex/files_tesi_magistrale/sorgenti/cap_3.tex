@@ -20,19 +20,53 @@ I messaggi di ritorno avranno una struttura del tipo:
 
 Codifichiamo quindi i messaggi per il gestore dei messaggi:
 
-\begin{tabular}{|c|l|}
-	\hline
-	test\_messaggio & Serve per fare un semplice test di comunicazione\\
-	\hline
-	register\_station & Indica al sistema che la postazione vuole essere registrata sul sistema \\
-	\hline
-	unregister\_station & Indica al sistema che la postazione vuole essere tolta dal sistema \\
-    \hline
-	request\_code & Indica al sistema che la postazione vuole essere registrata sul sistema \\
-    \hline
-	register\_station & Indica al sistema che la postazione vuole essere registrata sul sistema \\
-    \hline
-\end{tabular}
+\begin{table}[h]
+	\centering % Centra la tabella nella pagina
+	\caption{Elenco dei comandi che possono essere inviati dal client}
+	\begin{tabular}{|c|p{10cm}|}
+		\hline
+		test\_message & Serve per fare un semplice test di comunicazione\\
+		\hline
+		register\_station & La postazione vuole essere registrata sul sistema \\
+		\hline
+		unregister\_station & La postazione vuole essere tolta dal sistema \\
+	    \hline
+		request\_code & La postazione vuole ricevere il test associato al codice inviato \\
+	    \hline
+		send\_test\_content\_backup & Invia al sistema una versione temporanea del test \\
+	    \hline
+		send\_test\_content & Invia al sistema la versione definitiva del test\\
+		\hline
+	\end{tabular}
+\label{tab:tabella_comandi}
+\end{table}
+
+Il contenuto del messaggio dipender\'a dal tipo di messaggio. Ad esempio se il tipo di messaggio \'e \textbf{\textit{test\_messaggio}} il server si aspetter\'a anche il parametro \textbf{\textbf{\textit{numero\_iterazioni}}}.
+
+Allo stesso modo dobbiamo codificare i messaggi di risposta dei server nel caso in cui l'esecuzione vada a buon fine:
+\begin{table}[h]
+	\centering % Centra la tabella nella pagina
+	\caption{Elenco dei comandi di risposta da parte dei server}
+	\begin{tabular}{|c|l|}
+		\hline
+		\textbf{Messaggio in arrivo} & \textbf{Messaggio di risposta} \\
+		\hline
+		test\_message & test\_result\\
+		\hline
+		register\_station & registration\_result \\
+		\hline
+		unregister\_station & unregistration\_result \\
+		\hline
+		request\_code & test\_content \\
+		\hline
+		send\_test\_content\_backup & send\_test\_result \\
+		\hline
+		send\_test\_content & send\_test\_result \\
+		\hline
+	\end{tabular}
+	\label{tab:tabella_comandi}
+\end{table}
+
+Nel caso in cui usiamo il gestore di messaggi, la comunicazione sar\'a asincrona per cui, una volta inviato il messaggio da parte del client, nella risposta ci sar\'a l'id della richiesta e, ad intervalli regolari, il client potr\'a verificare se la richiesta \'e andata a buon fine come indicato nella figura \ref{fig:Esempio_comunicazione_con_gestore_messaggi}.
 
 
-Il contenuto del messaggio dipender\'a dal tipo di messaggio. Ad esempio se il tipo di messaggio \'e \textbf{\textit{test\_messaggio}}
