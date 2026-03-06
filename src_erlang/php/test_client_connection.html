@@ -1,32 +1,31 @@
 <html>
 <head>
 	<title>Client</title>
+	<link rel="icon" type="image/png" href="/favicon.png"> 
+	<link rel="shortcut icon" href="/favicon.ico">
 </head>
 <body>
 	<h1>Client di prova per verificare la comunicazione automatica con il gestore di messaggi</h1>
 	
-	<p><a href="javascript:StartInvioMessaggi()">Inizia invio dei messaggi.</a></p>
+	<p><a href="javascript:StartInvioMessaggi()">Inizia invio dei messaggi al gestore messaggi.</a></p>
 	<!-- 
 	<p><a href="">Registrazione postazione sulla piattaforma</a></p>
 	<p><a href="">De-Registrazione postazione sulla piattaforma</a></p>
 
 	<h2>Test javascript</h2>
 	-->
-	<p>Test get: <span id="get"></span></p>
+	<p>Test get Yaws: <span id="get"></span></p>
+	<p>Test get PHP: <span id="get_php"></span></p>
 	
-<!--
-	<h3>Test POST</h3>
-	<div id="post"></div>
--->
-	<div>Test POST con parametri: <span id="post_parametri"></span></div>
-<!--
-	<div id="post_parametri_"></div>
-	<div id="post_method"></div>
--->
+	<div>Test POST con parametri Yaws: <span id="post_parametri"></span></div>
 	<div style="border: 1px solid black;" id="return_message"></div>
+	<div>Test POST con parametri PHP: <span id="post_parametri_php"></span></div>
+	<div style="border: 1px solid black;" id="return_message_php"></div>
+	
 	<script src="utils.js">	</script>
 	<script>		
-	server = "http://localhost:8080/server.yaws"; /* variabile che memorizza il timer */
+	var server = "http://localhost:8080/server.yaws";
+	var server_php = "http://localhost/server.php";
 
 	var t_invio_messaggi;
 	var invio_messaggi_refresh_time_first_time = 1 * 1000; /* x secondi */
@@ -75,6 +74,13 @@
 			console.log("post_res :" + post_res.risposta.result);
 		});
 
+		post(server_php, dati).then((post_res) => {
+			document.getElementById("post_parametri_php").innerHTML = post_res.risposta.result_type;
+			document.getElementById("return_message_php").innerHTML = post_res.risposta.result;
+			console.log("msg-arrived_php:" + post_res.risposta.result_type);
+			console.log("post_res_php:" + post_res.risposta.result);
+		});
+
 
 
 	  /* faccio ripartire il timer per la prossima iterazione */
@@ -86,6 +92,10 @@
 		
 		get(server).then((post) => {
 			document.getElementById("get").innerHTML = post.result;
+		});
+
+		get(server_php).then((post) => {
+			document.getElementById("get_php").innerHTML = post.result;
 		});
 		/*
 		post(server).then((post_res) => {

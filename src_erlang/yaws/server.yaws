@@ -79,10 +79,10 @@
 
 	process_data_2(Arg) ->
 		Clidata = Arg#arg.clidata,
-		Parametri__ =
-		#{	<<"msg_type">> => <<"test_messaggio">>,
-			<<"numero_iterazioni">> => 1,
-			<<"test">> => <<"Sara">>},
+%		Parametri__ =
+%		#{	<<"msg_type">> => <<"test_messaggio">>,
+%			<<"numero_iterazioni">> => 1,
+%			<<"test">> => <<"Sara">>},
 		Parametri =
 			try 
 				json:decode(Clidata)
@@ -104,11 +104,13 @@
 				%list_to_binary("tipo_sconosciuto: is_map: " ++ is_map(Parametri))
 				<<"tipo_sconosciuto">> %% Valore di default se la chiave manca
 		end,
+		#{<<"numero_iterazioni">> := Iterazioni} = Parametri,
+		Prefisso = <<"result successfull">>,
 		case TipoMessaggio of
 			<<"test_messaggio">> ->
 				Parametri_res = #{
 					<<"result-type">> => <<"test_result">>,
-					<<"result">> => <<"result successfull">>
+					<<"result">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
 				};
 			<<"registra_postazione">> ->
 				Parametri_res = #{
@@ -157,11 +159,13 @@
 		%Messaggio = list_to_binary(json:encode(Parametri_in)),
 		%Tipo_Messaggio = list_to_binary(json:encode(Tipo_Messaggio_2)),
 		%Tipo_Messaggio = <<"test_messaggio">>,
+		#{<<"numero_iterazioni">> := Iterazioni} = Parametri,
+		Prefisso = <<"result successfull ">>,
 		case Tipo_Messaggio of
 			<<"test_messaggio">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"test_result">>,
-					<<"result">> => <<"result successfull">>
+					<<"result">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
 				};
 			<<"registra_postazione">> ->
 				Parametri_res = #{

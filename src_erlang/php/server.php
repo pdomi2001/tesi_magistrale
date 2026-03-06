@@ -1,17 +1,157 @@
 
 <?php
+function GetRequestMethod() {
+    return $_SERVER['REQUEST_METHOD'];
+}
 
-$db = GetDbConnection();
+function HandleGet() {
+    $action = $_GET['action'] ?? 'default';
+    
+    switch ($action) {
+        case 'status':
+            $db = GetDbConnection();
+            $free = SlotIsFree($db);
+            CloseDbConnection($db);
+            SendJsonResponse([
+                'result' => 'ok',
+                'status' => $free ? 'slot disponibili' : 'slot esauriti'
+            ]);
+            break;
 
-if (SlotIsFree($db)) {
+        case 'default':
+        default:
+            SendJsonResponse([
+                'result' => 'ok',
+                'message' => 'Server attivo'
+            ]);
+            break;
+    }
+}
+
+function HandlePost() {
+    $payload = GetPostJson();
+
+    if ($payload === null) {
+        SendJsonResponse(['result' => 'error', 'message' => 'Nessun dato ricevuto'], 400);
+    }
+
+    $msg_type = $payload['msg_type'] ?? 'sconosciuto';
+
+	SendJsonResponse(['result' => $payload, 'risposta' => GetRisposta($payload), 'id' => $mio_id]);
+        /*
+    switch ($msg_type) {
+        case 'test_messaggio':
+            SendJsonResponse([
+                'result'   => 'ok',
+                'msg_type' => $msg_type,
+                'data'     => $payload
+            ]);
+            break;
+
+        case 'registra_postazione':
+            $db = GetDbConnection();
+            try {
+                if (!SlotIsFree($db)) {
+                    SendJsonResponse(['result' => 'error', 'message' => 'Nessuno slot disponibile'], 503);
+                }
+                $mio_id = LockSlot($db);
+                SendJsonResponse(['result' => 'ok', 'id' => $mio_id]);
+            } finally {
+                CloseDbConnection($db);
+            }
+            break;
+
+        default:
+            SendJsonResponse([
+                'result'   => 'error',
+                'message'  => 'msg_type sconosciuto: ' . $msg_type
+            ], 400);
+            break;
+    }
+    */
+}
+
+try {
+    switch (GetRequestMethod()) {
+        case 'GET':
+            HandleGet();
+            break;
+        case 'POST':
+            HandlePost();
+            break;
+        default:
+            SendJsonResponse(['result' => 'error', 'message' => 'Metodo non supportato'], 405);
+            break;
+    }
+} catch (RuntimeException $e) {
+    SendJsonResponse(['result' => 'error', 'message' => $e->getMessage()], 500);
+}
+try {
+    $db      = GetDbConnection();
+    $payload = GetPostJson();
+
+    if ($payload === null) {
+        SendJsonResponse(['result' => 'error', 'message' => 'Nessun dato ricevuto'], 400);
+    }
+
+    if (!SlotIsFree($db)) {
+        SendJsonResponse(['result' => 'error', 'message' => 'Nessuno slot disponibile'], 503);
+    }
+
     $mio_id = LockSlot($db);
     try {
-		print("codice da eseguire");
+
+        SendJsonResponse(['result' => $payload, 'risposta' => GetRisposta($payload), 'id' => $mio_id]);
+        //SendJsonResponse(['result' => 'ok', 'risposta' => 'ok_risposta', 'id' => $mio_id]);
     } finally {
         UnLockSlot($db, $mio_id);
+        CloseDbConnection($db);  // chiusura garantita anche in caso di errore
     }
-} else {
-    echo "Nessuno slot disponibile.";
+
+} catch (RuntimeException $e) {
+    CloseDbConnection($db);
+    SendJsonResponse(['result' => 'error', 'message' => $e->getMessage()], 500);
+}
+
+function GetRisposta($payload) {
+	switch ($payload["msg_type"]) {
+		case "test_messaggio":
+			$result = [
+				"result_type" => "test_result",
+				"result" => "result successfull ".$payload["numero_iterazioni"]
+			];
+			break;
+		default:
+			$result = [
+				"result_type" => "not_found",
+				"result" => $payload["msg_type"]
+			];
+	} 
+	return $result;
+}
+
+function SendJsonResponse($data, $status_code = 200) {
+    http_response_code($status_code);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Access-Control-Allow-Origin: *'); // stesso header CORS che usi in YAWS
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+function GetPostJson() {
+    $raw = file_get_contents('php://input');
+    
+    if (empty($raw)) {
+        return null;
+    }
+
+    $data = json_decode($raw, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new RuntimeException('JSON non valido: ' . json_last_error_msg());
+    }
+
+    return $data;
 }
 
 function GetDbConnection() {
@@ -35,6 +175,10 @@ function GetDbConnection() {
     } catch (PDOException $e) {
         throw new RuntimeException('Errore connessione DB: ' . $e->getMessage());
     }
+}
+
+function CloseDbConnection(&$db) {
+    $db = null;
 }
 
 function GetMaxSlots() {
