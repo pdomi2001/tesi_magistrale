@@ -6,12 +6,6 @@
 			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"result\": ~p }", ["test get"]);
 
 			'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [get_data(Arg)])
-			%'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", [Arg#arg.clidata])
-			%'POST' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in POST\", \"method\": \"POST\", \"result\": ~p }", ["[{\"prova\": \"valore\", \"prova2\": \"valore2\" }]"])
-			%'POST' ->	io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", [rfc4627:decode("[{\"prova\": \"valore\"; \"prova2\": \"valore2\" }]")])
-			%'POST' ->	
-			%			data = Arg#arg.clidata, %rfc4627:decode(Arg#arg.clidata),
-			%			io_lib:format("{\"title\": \"Arrivato messaggio in post\", \"method\": \"post\",  \"post\": ~p }", ["[{\"prova\": \"valore\"; \"prova2\": \"valore2\" }]"])
 		end
 	.
 	
@@ -67,75 +61,10 @@
 			_ -> #{<<"error">> => <<"formato_sconosciuto">>}
 		end.	
 
-    get_data_2(Arg) ->
-		Clidata = Arg#arg.clidata,
-		{_, Parametri} = decode_Json(Clidata), 
-		%{ok, Jsondata, _} = rfc4627:decode(Clidata),
-		%Msgtype = rfc4627:get_field(Jsondata, "msg-type", <<>>),
-		%Result = io:format("~p", [Msg_Type]),
-		%Result = Clidata, %"test4",
-		Parametri
-		.
-
-	process_data_2(Arg) ->
-		Clidata = Arg#arg.clidata,
-%		Parametri__ =
-%		#{	<<"msg_type">> => <<"test_messaggio">>,
-%			<<"numero_iterazioni">> => 1,
-%			<<"test">> => <<"Sara">>},
-		Parametri =
-			try 
-				json:decode(Clidata)
-			catch
-				_:_ -> #{<<"msg_type">> => <<"decode_json_problem">>} 
-			end,
-%		ParametriTuple = yaws_api:parse_post(Arg),
-%		Parametri___ = maps:from_list(ParametriTuple),
-		%TipoMessaggio = maps:get(<<"test">>, Parametri, <<"default_value">>),
-		TipoMessaggio = try 
-			#{<<"msg_type">> := M} = Parametri,
-			%#{<<"test">> := M} = Parametri,
-			M  %% Se il match riesce, Messaggio diventerà il valore di M
-		catch 
-			error:{badmatch, _} ->
-				%list_to_binary("tipo_sconosciuto: is_map: " ++ Clidata)
-				%list_to_binary("tipo_sconosciuto: is_map: " ++ atom_to_binary(is_map(Parametri), utf8) ++ Clidata)
-				%list_to_binary("tipo_sconosciuto: " ++ Parametri ++ "is_map: "++ is_map(Parametri))
-				%list_to_binary("tipo_sconosciuto: is_map: " ++ is_map(Parametri))
-				<<"tipo_sconosciuto">> %% Valore di default se la chiave manca
-		end,
-		#{<<"numero_iterazioni">> := Iterazioni} = Parametri,
-		Prefisso = <<"result successfull">>,
-		case TipoMessaggio of
-			<<"test_messaggio">> ->
-				Parametri_res = #{
-					<<"result-type">> => <<"test_result">>,
-					<<"result">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
-				};
-			<<"registra_postazione">> ->
-				Parametri_res = #{
-					<<"result-type">> => <<"registration_result">>,
-					<<"result">> => <<"registration successfull">>
-				};
-				%Result = json:encode(Parametri),
-			_ -> 
-				Parametri_res = #{
-					<<"result-type">> => <<"not_found">>,
-					<<"result">> => TipoMessaggio
-				}
-		end,
-		Parametri_res
-		.	
 			
 	process_data(Arg) ->
 		%Clidata = get_data(Arg),
 		Clidata = iolist_to_binary(Arg#arg.clidata),
-%		{_, Parametri_} = 
-%			try 
-%				decode_Json(Clidata)
-%			catch
-%				_:_ -> { error, <<"decode_json_problem">> }
-%			end,
 		Parametri =
 			try 
 				json:decode(Clidata)
@@ -143,22 +72,7 @@
 				_:_ -> #{<<"msg_type">> => <<"decode_json_problem">>} 
 			end,
 		
-		%{ok, Messaggio2} = json:get_field(Parametri_in, "msg-type"),
 		Tipo_Messaggio = maps:get(<<"msg_type">>, Parametri, <<"default_value">>),
-		% Estraiamo il campo 'studente' in una variabile
-%		Tipo_Messaggio = try 
-%			%#{<<"msg_type">> := M} = Parametri,
-%			#{<<"test">> := M} = Parametri,
-%			M  %% Se il match riesce, Messaggio diventerà il valore di M
-%		catch 
-%			error:{badmatch, _} ->
-%				list_to_binary("tipo_sconosciuto: " ++ json:encode(Parametri))
-%				%<<"tipo_sconosciuto">> %% Valore di default se la chiave manca
-%		end,
-		%#{<<"msg_type">> := Tipo_Messaggio_2} = Parametri,
-		%Messaggio = list_to_binary(json:encode(Parametri_in)),
-		%Tipo_Messaggio = list_to_binary(json:encode(Tipo_Messaggio_2)),
-		%Tipo_Messaggio = <<"test_messaggio">>,
 		#{<<"msg_content">> := Msg_content}= Parametri,
 		#{<<"numero_iterazioni">> := Iterazioni} = Msg_content,
 		Prefisso = <<"result successfull ">>,
@@ -171,9 +85,8 @@
 			<<"registra_postazione">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"registration_result">>,
-					<<"result_content">> => <<"registration successfull">>
+					<<"result_content">> => <<"registration successful">>
 				};
-				%Result = json:encode(Parametri),
 			_ -> 
 				Parametri_res = #{
 					<<"result_type">> => <<"not_found">>,

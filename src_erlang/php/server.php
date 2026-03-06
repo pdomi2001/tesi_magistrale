@@ -118,7 +118,7 @@ function GetRisposta($payload) {
 		case "test_message":
 			$result = [
 				"result_type" => "test_result",
-				"result_content" => "result successfull ".$payload["msg_content"]["numero_iterazioni"]
+				"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
 			];
 			break;
 		default:
