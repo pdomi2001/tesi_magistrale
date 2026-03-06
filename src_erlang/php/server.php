@@ -115,16 +115,16 @@ try {
 
 function GetRisposta($payload) {
 	switch ($payload["msg_type"]) {
-		case "test_messaggio":
+		case "test_message":
 			$result = [
 				"result_type" => "test_result",
-				"result" => "result successfull ".$payload["numero_iterazioni"]
+				"result_content" => "result successfull ".$payload["msg_content"]["numero_iterazioni"]
 			];
 			break;
 		default:
 			$result = [
 				"result_type" => "not_found",
-				"result" => $payload["msg_type"]
+				"result_content" => $payload["msg_type"]
 			];
 	} 
 	return $result;

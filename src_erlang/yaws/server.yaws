@@ -159,24 +159,25 @@
 		%Messaggio = list_to_binary(json:encode(Parametri_in)),
 		%Tipo_Messaggio = list_to_binary(json:encode(Tipo_Messaggio_2)),
 		%Tipo_Messaggio = <<"test_messaggio">>,
-		#{<<"numero_iterazioni">> := Iterazioni} = Parametri,
+		#{<<"msg_content">> := Msg_content}= Parametri,
+		#{<<"numero_iterazioni">> := Iterazioni} = Msg_content,
 		Prefisso = <<"result successfull ">>,
 		case Tipo_Messaggio of
-			<<"test_messaggio">> ->
+			<<"test_message">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"test_result">>,
-					<<"result">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
+					<<"result_content">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
 				};
 			<<"registra_postazione">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"registration_result">>,
-					<<"result">> => <<"registration successfull">>
+					<<"result_content">> => <<"registration successfull">>
 				};
 				%Result = json:encode(Parametri),
 			_ -> 
 				Parametri_res = #{
 					<<"result_type">> => <<"not_found">>,
-					<<"result">> => Tipo_Messaggio
+					<<"result_content">> => Tipo_Messaggio
 				}
 		end,
 		%Messaggio = <<"messaggio2a">>,

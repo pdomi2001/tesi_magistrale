@@ -53,9 +53,11 @@
 	  /* return callbackvar; */
 		const dati = 
 		{ 
-			msg_type: "test_messaggio", 
-			"numero_iterazioni": numero_iterazioni, 
-			"test": "Sara" 
+			"msg_type": "test_message", 
+			"msg_content": {
+				"numero_iterazioni": numero_iterazioni, 
+				"test": "Sara" 
+			}
 		};
 /*	[
 		{ 
@@ -69,16 +71,16 @@
 
 		post(server, dati).then((post_res) => {
 			document.getElementById("post_parametri").innerHTML = post_res.risposta.result_type;
-			document.getElementById("return_message").innerHTML = post_res.risposta.result;
+			document.getElementById("return_message").innerHTML = post_res.risposta.result_content;
 			console.log("msg-arrived:" + post_res.risposta.result_type);
-			console.log("post_res :" + post_res.risposta.result);
+			console.log("post_res :" + post_res.risposta.result_content);
 		});
 
 		post(server_php, dati).then((post_res) => {
 			document.getElementById("post_parametri_php").innerHTML = post_res.risposta.result_type;
-			document.getElementById("return_message_php").innerHTML = post_res.risposta.result;
+			document.getElementById("return_message_php").innerHTML = post_res.risposta.result_content;
 			console.log("msg-arrived_php:" + post_res.risposta.result_type);
-			console.log("post_res_php:" + post_res.risposta.result);
+			console.log("post_res_php:" + post_res.risposta.result_content);
 		});
 
 
