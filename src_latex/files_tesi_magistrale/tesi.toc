@@ -16,17 +16,17 @@
 \contentsline {section}{\numberline {2.3}Diagrammi degli stati}{7}{}%
 \contentsline {chapter}{\numberline {3}Strutture di comunicazione}{10}{}%
 \contentsline {section}{\numberline {3.1}Struttura JSON}{10}{}%
-\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{11}{}%
-\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{11}{}%
-\contentsline {subsection}{\numberline {4.1.1}Lato client Javascript}{11}{}%
-\contentsline {section}{\numberline {4.2}Lato gestore dei messaggi}{13}{}%
-\contentsline {subsubsection}{Dati della Richiesta}{13}{}%
-\contentsline {subsection}{\numberline {4.2.1}Gestione delle diverse tipologie di connessione}{14}{}%
-\contentsline {section}{\numberline {4.3}Comunicazione tra gestore dei messaggi e server PHP}{15}{}%
-\contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{15}{}%
-\contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{16}{}%
-\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{18}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{19}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{20}{}%
-\contentsline {chapter}{Bibliografia}{21}{}%
-\contentsline {chapter}{Ringraziamenti}{22}{}%
+\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{12}{}%
+\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{12}{}%
+\contentsline {subsection}{\numberline {4.1.1}Lato client Javascript}{12}{}%
+\contentsline {section}{\numberline {4.2}Lato gestore dei messaggi}{14}{}%
+\contentsline {subsubsection}{Dati della Richiesta}{14}{}%
+\contentsline {subsection}{\numberline {4.2.1}Gestione delle diverse tipologie di connessione}{15}{}%
+\contentsline {section}{\numberline {4.3}Comunicazione tra gestore dei messaggi e server PHP}{16}{}%
+\contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{16}{}%
+\contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{17}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{19}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{20}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{21}{}%
+\contentsline {chapter}{Bibliografia}{22}{}%
+\contentsline {chapter}{Ringraziamenti}{23}{}%
