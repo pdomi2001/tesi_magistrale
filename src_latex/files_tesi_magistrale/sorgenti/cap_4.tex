@@ -168,6 +168,12 @@ processa_comandi('GET', _Arg) ->
     .
 \end{verbatim}
 
+\subsection{Memorizzazione dei messaggi}
+Per memorizzare i messaggi in transito tra il client e il server, avvenendo la comunicazione in modo asincrono, ci avveleremo del database nativo erlang mnesia\cite{web:mnesia} che ci permetterà di memorizzare in modo efficace i vari comandi da inviare al server PHP ed anche le risposte di questo da inviare al client javascript.
+
+Dato che i messaggi inviati dal client e quelli resituiti dal server hanno una struttura simile e che i codici dei messaggi non sono sovrapponibili useremo una sola tabella per memorizzare la coda dei messaggi.
+
+
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
 \subsection{Limitazione del numero di connessioni al server PHP}
