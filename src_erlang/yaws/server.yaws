@@ -73,16 +73,22 @@
 		
 		Tipo_Messaggio = maps:get(<<"msg_type">>, Parametri, <<"default_value">>),
 		Msg_content = maps:get(<<"msg_content">>, Parametri, <<"default_value_content">>),
-		Iterazioni = maps:get(<<"numero_iterazioni">>, Parametri, <<"0">>),
+		Iterazioni = maps:get(<<"numero_iterazioni">>, Msg_content, 0),
+		IterazioniBinary = if
+			is_integer(Iterazioni) -> integer_to_binary(Iterazioni);
+			is_binary(Iterazioni)  -> Iterazioni;
+			true           -> <<"iterazioni_non_valido">>
+		end,
 %		#{<<"msg_content">> := Msg_content}= Parametri,
 %		#{<<"numero_iterazioni">> := Iterazioni} = Msg_content,
 		
-		Prefisso = <<"result successfull ">>,
+		Prefisso = <<"result successful ">>,
 		case Tipo_Messaggio of
 			<<"test_message">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"test_result">>,
-					<<"result_content">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
+					<<"result_content">> => <<Prefisso/binary, IterazioniBinary/binary>>
+					%<<"result_content">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
 				};
 			<<"test_message_m">> ->
 				% Salva la richiesta in Mnesia
@@ -97,14 +103,19 @@
 				Parametri_res;
 			<<"test_message_r">> ->
 				% Leggi la richiesta in Mnesia
-				Id = maps:get(<<"id">>, Msg_content, <<"default_value">>),
+				Id = maps:get(<<"id">>, Msg_content, 0),
+				IdBinary = if
+					is_integer(Id) -> integer_to_binary(Id);
+					is_binary(Id)  -> Id;
+					true           -> <<"id_non_valido">>
+				end,
 				case leggi_richiesta(Id) of
 					{ok, Result} ->
 						Parametri_res = #{
 						<<"result_type">> => <<"test_result_r">>,
 						<<"result_content">> => #{
 								<<"result_desc">> => <<"reading_result">>,
-								<<"content">> => Id
+								<<"content">> => IdBinary
 								}
 						};
 					{error, not_found} ->
@@ -112,7 +123,7 @@
 						<<"result_type">>  => <<"error">>,
 						<<"result_content">> => #{
 								<<"result_desc">> => <<"id non trovato">>,
-								<<"content">> => Id
+								<<"content">> => IdBinary
 								}
 						};
 					{error, Reason} ->
