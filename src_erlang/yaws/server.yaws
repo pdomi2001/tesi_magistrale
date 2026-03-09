@@ -1,6 +1,5 @@
 <erl>
-	%-include("msg_func.hrl").
-	 
+ 
 	test_reply(Arg) ->
 		case method(Arg) of
 			'GET' -> 	io_lib:format("{\"title\": \"Arrivato messaggio in GET\", \"method\": \"get\", \"result\": ~p }", ["test get"]);
@@ -73,8 +72,11 @@
 			end,
 		
 		Tipo_Messaggio = maps:get(<<"msg_type">>, Parametri, <<"default_value">>),
-		#{<<"msg_content">> := Msg_content}= Parametri,
-		#{<<"numero_iterazioni">> := Iterazioni} = Msg_content,
+		Msg_content = maps:get(<<"msg_content">>, Parametri, <<"default_value_content">>),
+		Iterazioni = maps:get(<<"numero_iterazioni">>, Parametri, <<"0">>),
+%		#{<<"msg_content">> := Msg_content}= Parametri,
+%		#{<<"numero_iterazioni">> := Iterazioni} = Msg_content,
+		
 		Prefisso = <<"result successfull ">>,
 		case Tipo_Messaggio of
 			<<"test_message">> ->
@@ -82,6 +84,47 @@
 					<<"result_type">> => <<"test_result">>,
 					<<"result_content">> => <<Prefisso/binary, (integer_to_binary(Iterazioni))/binary>>
 				};
+			<<"test_message_m">> ->
+				% Salva la richiesta in Mnesia
+				Id = inserisci_richiesta(Tipo_Messaggio, Msg_content),
+				Parametri_res = #{
+					<<"result_type">> => <<"test_result_m">>,
+					<<"result_content">> => #{
+							<<"result_desc">> => <<Prefisso/binary>>,
+							<<"id_message">> => integer_to_binary(Id)
+							}
+				},
+				Parametri_res;
+			<<"test_message_r">> ->
+				% Leggi la richiesta in Mnesia
+				Id = maps:get(<<"id">>, Msg_content, <<"default_value">>),
+				case leggi_richiesta(Id) of
+					{ok, Result} ->
+						Parametri_res = #{
+						<<"result_type">> => <<"test_result_r">>,
+						<<"result_content">> => #{
+								<<"result_desc">> => <<"reading_result">>,
+								<<"content">> => Id
+								}
+						};
+					{error, not_found} ->
+						Parametri_res = #{
+						<<"result_type">>  => <<"error">>,
+						<<"result_content">> => #{
+								<<"result_desc">> => <<"id non trovato">>,
+								<<"content">> => Id
+								}
+						};
+					{error, Reason} ->
+						Parametri_res = #{
+						<<"result_type">>  => <<"error">>,
+						<<"result_content">> => #{
+								<<"result_desc">> => <<"id non trovato">>,
+								<<"content">> => list_to_binary(io_lib:format("~p", [Reason]))
+								}
+						}
+				end,
+				Parametri_res;
 			<<"registra_postazione">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"registration_result">>,
@@ -93,22 +136,13 @@
 					<<"result_content">> => Tipo_Messaggio
 				}
 		end,
-		%Messaggio = <<"messaggio2a">>,
-		%Parametri = #{
-		%	<<"result-type">> => <<"test_result">>,
-		%	<<"result">> => <<"result successfull">>,
-		%	<<"msg_arrived_numelements">> => maps:size(Parametri_in),
-		%	%<<"msg_arrived_numelements">> => is_map(Parametri_in),
-		%	<<"msg_arrived">> => Messaggio
-		%},
-		%Result = json:encode(Parametri),
 		Parametri_res
 		.
 
-	get_data2(Arg) ->  
-		{ok, Json, _}  = rfc4627:decode(Arg#arg.clidata),
-		io:format("~n~p:~p POST request ~p~n", [?MODULE, ?LINE, Json])
-		.
+%	get_data2(Arg) ->  
+%		{ok, Json, _}  = rfc4627:decode(Arg#arg.clidata),
+%		io:format("~n~p:~p POST request ~p~n", [?MODULE, ?LINE, Json])
+%		.
 
 	decode_Json(JsonRaw) ->
 		Mappa = 
@@ -122,30 +156,6 @@
 		end,
 		{ok, Mappa}
 		.
-%		case json:decode(JsonRaw) of
-%			{ok, {obj, Dati}, _} ->
-%				% Estraiamo un valore specifico (es. lo studente)
-%				%{ok, Studente} = rfc4627:get_field({obj, Dati}, "studente"),
-%				%{ok, Studente} = json:get_field({obj, Dati}, "studente"),
-%				#{<<"studente">> := Studente} = Dati,
-%				
-%				% Qui chiameresti il tuo "Gestore di messaggi" per salvare i dati
-%				%io:format("Ricevuti risultati per lo studente: ~p~n", [Studente]),
-%				
-%				% 4. Rispondiamo al client con un messaggio di successo
-%				Risposta = json:encode({obj, [{"status", "ok"}, {"msg", "Ricevuto!"}]}),
-%				{content, "application/json", Risposta};
-%
-%			{unexpected_byte, Byte, Position} ->
-%				% Gestione errore se il JSON è malformato
-%				{status, 400};
-%			{unexpected_end, Position} ->
-%				% Gestione errore se il JSON è malformato
-%				{status, 400};
-%			invalid_utf8 ->
-%				{status, 400}
-%		end	 		
-%		.
 
 	out(Arg) ->
 		Method = method(Arg),
@@ -173,9 +183,55 @@
 			{content, "application/json", Risultato}
 		]
 		.   
-		%{ehtml, test_reply(Arg)}.
-		%{ehtml, f("{\"title\": \"title\", \"method\": \"~p\" }", [method(Arg)])}.  
-		%msg_func:test_reply(Arg).
-		%{ehtml, f("{\"title\": \"title\", \"post\": \"~p\" }", [yaws_api:parse_post(Arg)])}.  
+
+	% gestione del Database
+	% Definizione del record
+	-record(richiesta, {
+		id,           % chiave univoca
+		msg_type,     % tipo messaggio
+		payload,      % dati della richiesta
+		stato,        % in_attesa | in_elaborazione | completata
+		timestamp     % quando è arrivata
+	}).
+	
+	% INSERT - salva una nuova richiesta
+inserisci_richiesta(MsgType, Payload) ->
+    Id = erlang:unique_integer([positive]),
+    R = #richiesta{
+        id        = Id,
+        msg_type  = MsgType,
+        payload   = Payload,
+        stato     = in_attesa,
+        timestamp = erlang:localtime()
+    },
+    mnesia:transaction(fun() -> mnesia:write(R) end),
+    Id.
+
+% READ - leggi una richiesta per id
+leggi_richiesta(Id) ->
+    case mnesia:transaction(fun() -> mnesia:read(richiesta, Id) end) of
+        {atomic, [R]} ->
+            % Trovato
+            {ok, R};
+        {atomic, []} ->
+            % Non trovato
+            {error, not_found};
+        {aborted, Reason} ->
+            % Errore Mnesia
+            {error, Reason}
+    end.
+
+% UPDATE - aggiorna lo stato
+aggiorna_stato(Id, NuovoStato) ->
+    mnesia:transaction(fun() ->
+        [R] = mnesia:read(richiesta, Id),
+        mnesia:write(R#richiesta{stato = NuovoStato})
+    end).
+
+% DELETE - rimuovi una richiesta completata
+elimina_richiesta(Id) ->
+    mnesia:transaction(fun() ->
+        mnesia:delete({richiesta, Id})
+    end).
 
 </erl>
