@@ -171,8 +171,134 @@ processa_comandi('GET', _Arg) ->
 \subsection{Memorizzazione dei messaggi}
 Per memorizzare i messaggi in transito tra il client e il server, avvenendo la comunicazione in modo asincrono, ci avveleremo del database nativo erlang mnesia\cite{web:mnesia} che ci permetterà di memorizzare in modo efficace i vari comandi da inviare al server PHP ed anche le risposte di questo da inviare al client javascript.
 
-Dato che i messaggi inviati dal client e quelli resituiti dal server hanno una struttura simile e che i codici dei messaggi non sono sovrapponibili useremo una sola tabella per memorizzare la coda dei messaggi.
+Dato che i messaggi inviati dal client e quelli resituiti dal server hanno una struttura simile e che i codici dei messaggi non sono sovrapponibili useremo una sola tabella per la coda dei messaggi.
 
+I record della tabella avranno la seguente struttura:
+
+\begin{table}[h]
+	\centering % Centra la tabella nella pagina
+	\caption{Struttura dei record della tabella mnesia}
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{Nome campo} & \textbf{Significato} \\
+		\hline
+		id & Identificativo del messaggio \\
+		\hline
+		msg\_type & Tipo di messaggio \\
+		\hline
+		payload & Contenuto del messaggio \\
+		\hline
+		stato & Stato del messaggio (non ancora usato) \\
+		\hline
+		timestamp & Data e ora di inserimento del dato nel DB (Serve per poter fare pulizia) \\
+		\hline
+	\end{tabular}
+	\label{tab:tabella_mnesia}
+\end{table}
+
+Creiamo quindi un file che permetta di inizializzare il database che dovr\'a contenere la tabella mnesia.
+
+\begin{verbatim}
+out(Arg) ->
+	Risultato = try
+		esegui_inizializzazione()
+	catch
+		_:Errore -> #{
+				<<"result">>  => <<"error">>,
+				<<"message">> => list_to_binary(io_lib:format("~p", [Errore]))
+			}
+	end,
+	[
+		{header, {"Access-Control-Allow-Origin", "*"}},
+		{content, "application/json", json:encode(Risultato)}
+	].
+
+esegui_inizializzazione() ->
+	Passi = [
+		{"schema",  fun crea_schema/0},
+		{"mnesia",  fun avvia_mnesia/0},
+		{"tabelle", fun crea_tabelle/0}
+	],
+	Risultati = lists:map(fun({Nome, Funzione}) ->
+		Esito = try
+			Funzione(),
+			<<"ok">>
+		catch
+			_:Motivo -> list_to_binary(io_lib:format("~p", [Motivo]))
+		end,
+		{list_to_binary(Nome), Esito}
+	end, Passi),
+	
+	application:set_env(yaws, db_inizializzato, true),
+	
+	maps:from_list([
+		{<<"result">>, <<"ok">>},
+		{<<"passi">>,  maps:from_list(Risultati)}
+	]).
+
+crea_schema() ->
+	case mnesia:create_schema([node()]) of
+		ok -> ok;
+		{error, {_, {already_exists, _}}} -> already_exists
+	end.
+
+avvia_mnesia() ->
+	case mnesia:start() of
+	ok -> ok;
+	{error, {already_started, _}} -> already_started
+end.
+
+crea_tabelle() ->
+	case mnesia:create_table(richiesta, [
+		{attributes, [id, msg_type, payload, stato, timestamp]},
+		{type, set},
+		%{disc_copies, [node()]}
+		{ram_copies, [node()]}
+	]) of
+		{atomic, ok}                    -> ok;
+		{aborted, {already_exists, _}}  -> already_exists
+end.
+\end{verbatim}
+
+Nel codice erlang del server yaws mettiamo la gestione di scrittura e lettura dei vari messaggi:
+
+\begin{verbatim}
+	<<"test_message_m">> ->
+		% Salva la richiesta in Mnesia
+		Id = inserisci_richiesta(Tipo_Messaggio, Msg_content),
+		Parametri_res = #{
+			<<"result_type">> => <<"test_result_m">>,
+			<<"result_content">> => #{
+				<<"result_desc">> => <<Prefisso/binary>>,
+				<<"id_message">> => integer_to_binary(Id)
+			}
+		},
+		Parametri_res;
+	<<"test_message_r">> ->
+		% Leggi la richiesta in Mnesia
+		Id = maps:get(<<"Msg_content">>, Parametri, <<"default_value">>),
+		case leggi_richiesta(Id) of
+		{ok, Result} ->
+		Parametri_res = #{
+			<<"result_type">> => <<"test_result_r">>,
+			<<"result_content">> => #{
+				<<"result_desc">> => <<"reading_result">>,
+				<<"content">> => integer_to_binary(Id)
+			}
+		};
+		{error, not_found} ->
+		Parametri_res = #{
+			<<"result">>  => <<"error">>,
+			<<"message">> => <<"id non trovato">>
+		};
+		{error, Reason} ->
+		Parametri_res = #{
+			<<"result">>  => <<"error">>,
+			<<"message">> => list_to_binary(io_lib:format("~p", [Reason]))
+		}
+		end,
+		Parametri_res;
+\end{verbatim}
 
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
