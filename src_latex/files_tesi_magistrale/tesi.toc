@@ -23,11 +23,11 @@
 \contentsline {subsubsection}{Dati della Richiesta}{14}{}%
 \contentsline {subsection}{\numberline {4.2.1}Gestione delle diverse tipologie di connessione}{15}{}%
 \contentsline {subsection}{\numberline {4.2.2}Memorizzazione dei messaggi}{16}{}%
-\contentsline {section}{\numberline {4.3}Comunicazione tra gestore dei messaggi e server PHP}{17}{}%
-\contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{17}{}%
-\contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{17}{}%
-\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{20}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{21}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{22}{}%
-\contentsline {chapter}{Bibliografia}{23}{}%
-\contentsline {chapter}{Ringraziamenti}{24}{}%
+\contentsline {section}{\numberline {4.3}Comunicazione tra gestore dei messaggi e server PHP}{19}{}%
+\contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{19}{}%
+\contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{20}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{22}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{23}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{24}{}%
+\contentsline {chapter}{Bibliografia}{25}{}%
+\contentsline {chapter}{Ringraziamenti}{26}{}%
