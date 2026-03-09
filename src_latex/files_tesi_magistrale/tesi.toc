@@ -27,7 +27,11 @@
 \contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{19}{}%
 \contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{20}{}%
 \contentsline {chapter}{\numberline {5}Verifica della funzionalit\'a}{22}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{23}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{24}{}%
-\contentsline {chapter}{Bibliografia}{25}{}%
-\contentsline {chapter}{Ringraziamenti}{26}{}%
+\contentsline {subsection}{\numberline {5.0.1}Verifica connessione di base}{22}{}%
+\contentsline {subsection}{\numberline {5.0.2}Verifica connessione con gestore messaggi}{22}{}%
+\contentsline {subsection}{\numberline {5.0.3}Stress test}{22}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{24}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{25}{}%
+\contentsline {section}{\numberline {A.1}Client javascript per Verifica connessione di base}{25}{}%
+\contentsline {chapter}{Bibliografia}{28}{}%
+\contentsline {chapter}{Ringraziamenti}{29}{}%

@@ -1,5 +1,5 @@
 \chapter{Implementazione della comunicazione}
-Per l'implementazione ci affideremo al web server implementato in Erlang\cite{web:erlang},  Yaws\cite{web:yaws}. 
+Per l'implementazione del gestore di messaggi ci affideremo al web server implementato in Erlang\cite{web:erlang},  Yaws\cite{web:yaws}. 
 
 Yaws usa un sistema simile a quello di PHP.
 Permette infatti di includere codice erlang direttamente all'interno della pagina WEB inserendolo all'interno delle coppia di tag <erl> e </erl>.
@@ -96,7 +96,7 @@ out(Arg) ->
     .
 \end{verbatim} 
 
-Alla funzione vengono passati una serie di parametri inviati dal client. Questi parametri sono passati dentro alla varibile Arg che \'e un record e contiene diversi dati sulla connessione e sulla richiesta inviata al server web. Tra i pi\'u importanti troviamo:
+Alla funzione vengono passati una serie di parametri inviati dal client. Questi parametri sono passati dentro alla varibile Arg che \'e di tipo record e contiene diversi dati sulla connessione e sulla richiesta inviata al server web. Tra i pi\'u importanti troviamo:
 
 \subsubsection{Dati della Richiesta}
 \begin{itemize}
@@ -111,17 +111,16 @@ Alla funzione vengono passati una serie di parametri inviati dal client. Questi 
 
 I parametri che a noi interessano principalmente sono il metodo di connessioni (GET o POST) perch\'e i dati devono essere prelevati in modo differente, e le due variabili clidata per le chiamate in modalit\'a POST e querydata per le chiamate in modalit\'a GET.
 
-Vedremo meglio come gestire questa differenza pi\'u avanti.
-Nel codice sopra possiamo notare una sezione aggiuntiva che restituisce degli header aggiuntivi rispetto alla richiesta. Questi header si rendono necessari perch\'e i browser, per evitare che ci possano essere attacchi di tipo XSS (Cross Site Scripting) impediscono collegamenti javascript che siano diretti al di fuori del proprio collegamento.
+Nel codice sopra possiamo notare una sezione che restituisce degli header aggiuntivi rispetto alla richiesta. Questi header si rendono necessari perch\'e i browser, per evitare che ci possano essere attacchi di tipo XSS (Cross Site Scripting) impediscono collegamenti javascript che siano diretti al di fuori del proprio collegamento.
 
 Nella nostra macchina di test, per poter eseguire contemporaneamente i server http PHP e YAWS abbiamo dovuto differenziare le porte per la connessione. Il server http PHP \'e stato impostato per lavorare sulla porta 80, mentre il server http yaws \'e stato impostato per lavorare sulla porta 8080.
 Avendo messo il client sulla porta 80, per il browser qualsiasi collegamento, compresi quelli sulla stessa macchina ma su una porta diversa, vengono visti come collegamenti esterni.
 
-Per ovviare a questo problema \'e necessario che il server conceda, tramite un parametro dell'header la possibilit\'a di accesso da un sito esterno. Per far questo aggiungiamo alla risposta "Access-Control-Allow-Origin" mettendo come sito autorizzato a collegarsi "*" che significa che tutti i siti possono accedere a lui.
+Per ovviare a questo problema \'e necessario che il server conceda, tramite un parametro dell'header la possibilit\'a di accesso da un sito esterno. Per far questo aggiungiamo alla risposta "Access-Control-Allow-Origin" impostando come sito autorizzato a collegarsi "*". Questo significa che tutti i siti esterni sono autorizzati ad accedere al server yaws.
 
 \subsection{Gestione delle diverse tipologie di connessione}
-La funzione processa\_comandi si occupa di differenziare la gestione dei messaggi in base alla tipologia di connessione.
-In questo momento ci concentreremo sui comandi in POST anche se implementeremo comunque anche la gestione di quelli in GET per poter fare dei test di connessione.
+La funzione \textit{processa\_comandi} si occupa di differenziare la gestione dei messaggi in base alla tipologia di connessione.
+In questo momento ci concentreremo sui comandi in POST anche se implementeremo comunque anche la gestione di quelli in GET per poter fare dei test di connessione in futuro.
 
 Innanzitutto creeremo una mappa con i parametri da restituire indietro. I parametri principali saranno: title, method, result, risposta. 
 
@@ -300,6 +299,8 @@ Nel codice erlang del server yaws mettiamo la gestione di scrittura e lettura de
 		Parametri_res;
 \end{verbatim}
 
+come si pu\'o notare, per poter mantenere la struttura che abbiamo creato per fare i primi test, cambieremo la tipologia dei messaggi che il client dovr\'a inviare al gestore dei messaggi: \textit{\textbf{test\_message\_m}} \'e il messaggio che il client dovr\'a inviare al gestore dei messaggi per effettuare il test\
+
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
 \subsection{Limitazione del numero di connessioni al server PHP}
@@ -313,7 +314,7 @@ Ci sono diversi metodi per limitare il numero connessioni che il server PHP acce
 
 Ognuno di questi ha dei vantaggi e degli svantaggi. Webhooks ad esempio ha il vantaggio che \'e il gestore dei messaggi ad inviare i messaggi ma rimane con lo stesso problema che abbiamo con la configurazione originale client/server; rischiamo infatti che il server di sovraccarichi.
 Semaphore d'altro canto richiede, per l'utilizzo dei semafori del sistema operativo, che il nostro web server si trovi su un distribuzione Linux.
-La gestione del numero massimo di processi modificando la configurazione del web server richiede invece la possibilit\'a di modificare i file di configurazione, cosa che non sempre \'e possibile e che dipende dalla scelta della macchina su cui far girare i nostri sorgenti php. Potrebbe essere una configurazione condivisa senza possibilit\'a di cambiare i parametri di base.
+La gestione del numero massimo di processi modificando la configurazione del web server richiede invece la possibilit\'a di modificare i file di configurazione, cosa che non sempre \'e possibile e che dipende dalla scelta della macchina su cui far girare i nostri sorgenti PHP. Potrebbe essere una configurazione condivisa senza possibilit\'a di cambiare i parametri di base.
 
 L'utilizzo di una tabella del nostro database mysql o mariadb per gestire il numero massimo di richieste in arrivo dal gestore dei messaggi sembra quindi essere la soluzione migliore.
 Non siamo legati al sistema operativo e non abbiamo bisogno di accedere alla configurazione di PHP. Il database \'e gi\'a installato per memorizzare i risultati delle prove svolte.
@@ -323,7 +324,7 @@ Come gi\'a detto, per limitare le connessioni al server web PHP, implementeremo 
 
 Nel momento arriva una nuova connessione andremo a vedere, nella tabella delle connessioni attive, quante connessioni sono gi\'a in essere. Se il numero supera il numero massimo stabilito risponderemo alla chiamata con un messaggio che indichi il sovraccarico. In caso contrario aggiungeremo alla tabella un elemento ed eseguiremo il comando che ci \'e stato richiesto. Al termine del comando cancelleremo dalla tabella la riga corrispondente.
 
-Potrebbe per\'o capitare che, per errori nel codice php o altro, l'esecuzione si interrompa in modo inaspettato lasciando nella tabella una riga non pi\'u valida. L'accumulo di queste righe impedir\'a la ricezione di nuovi messaggi da parte del gestore dei messaggi. Implementeremo quindi una procedura di emergenza che, ad intervalli casuali di tempo, cancelli gli elementi della tabella pi\'u vecchi. Possiamo stabilire, come tempo massimo di permanenza nella tabella, un minuto. Sar\'a infatti molto improbabile che ci siano processi che richiedano pi\'u id una trentina di secondi per essere eseguiti. 
+Potrebbe per\'o capitare che, per errori nel codice PHP o altro, l'esecuzione si interrompa in modo inaspettato lasciando nella tabella una riga non pi\'u valida. L'accumulo di queste righe impedir\'a la ricezione di nuovi messaggi da parte del gestore dei messaggi. Implementeremo quindi una procedura di emergenza che, ad intervalli casuali di tempo, cancelli gli elementi della tabella pi\'u vecchi. Possiamo stabilire, come tempo massimo di permanenza nella tabella, un minuto. Sar\'a infatti molto improbabile che ci siano processi che richiedano pi\'u id una trentina di secondi per essere eseguiti. 
 
 Creiamo quindi la tabella nel database:
 

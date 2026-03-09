@@ -1,1 +1,94 @@
-\chapter{Appendice A} 
+\chapter{Appendice A}
+
+
+\section{Client javascript per Verifica connessione di base}
+\label{javascript_verifica_base_src}
+\begin{verbatim}
+<html>
+<head>
+<title>Client</title>
+<link rel="icon" type="image/png" href="/favicon.png"> 
+<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body>
+<h1>Client di prova per verificare la comunicazione automatica con il 
+gestore di messaggi</h1>
+
+<p><a href="javascript:StartInvioMessaggi()">Inizia invio dei messaggi 
+al gestore messaggi.</a></p>
+<p>Test get Yaws: <span id="get"></span></p>
+<p>Test get PHP: <span id="get_php"></span></p>
+
+<div>Test POST con parametri Yaws: <span id="post_parametri"></span></div>
+<div style="border: 1px solid black;" id="return_message"></div>
+<div>Test POST con parametri PHP: <span id="post_parametri_php"></span></div>
+<div style="border: 1px solid black;" id="return_message_php"></div>
+
+<script src="utils.js">	</script>
+<script>		
+var server = "http://localhost:8080/server.yaws";
+var server_php = "http://localhost/server.php";
+
+var t_invio_messaggi;
+var invio_messaggi_refresh_time_first_time = 1 * 1000; /* x secondi */
+var invio_messaggi_refresh_time = 10 * 1000; /* x secondi */
+var numero_iterazioni = 0;
+
+	/* Inizializza la procedura per inviare i messaggi ai server */
+	function StartInvioMessaggi() {
+		clearTimeout(t_invio_messaggi);
+		t_invio_messaggi = setTimeout('InvioMessaggi()',
+		           invio_messaggi_refresh_time_first_time); 
+	}
+
+	/* Funzione che invia un messaggio ai server */
+	function InvioMessaggi()
+	{
+		const dati = 
+		{ 
+			"msg_type": "test_message", 
+			"msg_content": {
+				"numero_iterazioni": numero_iterazioni, 
+				"test": "Sara" 
+			}
+		};
+		numero_iterazioni = numero_iterazioni + 1;
+		
+		/* invio un messaggio di tipo POST al server Yaws */	
+		post(server, dati).then((post_res) => {
+			document.getElementById("post_parametri").innerHTML =
+							post_res.risposta.result_type;
+			document.getElementById("return_message").innerHTML = 
+							post_res.risposta.result_content;
+			console.log("msg-arrived:" + post_res.risposta.result_type);
+			console.log("post_res :" + post_res.risposta.result_content);
+		});
+		
+		post(server_php, dati).then((post_res) => {
+			document.getElementById("post_parametri_php").innerHTML = 
+							post_res.risposta.result_type;
+			document.getElementById("return_message_php").innerHTML = 
+							post_res.risposta.result_content;
+			console.log("msg-arrived_php:" + post_res.risposta.result_type);
+			console.log("post_res_php:" + post_res.risposta.result_content);
+		});
+		
+		/* faccio ripartire il timer per la prossima iterazione */
+		t_invio_messaggi = setTimeout('InvioMessaggi()', invio_messaggi_refresh_time); 
+	}
+
+	/* invio un messaggio di tipo GET al server Yaws */	
+	get(server).then((post) => {
+		document.getElementById("get").innerHTML = post.result;
+	});
+	
+	/* invio un messaggio di tipo GET al server php */	
+	get(server_php).then((post) => {
+		document.getElementById("get_php").innerHTML = post.result;
+	});
+
+	</script>
+	</body>
+	</html>
+
+\end{verbatim}

@@ -15,8 +15,9 @@ Al momento la somministrazione dei test al PC utilizzando i browser web utilizza
 In linea di massima lo schema \'e quello visibile in figura \ref{fig:configurazione_attuale}.
 
 \begin{figure}[!hbtp]
-  \includegraphics[width=0.5\textwidth]{figure/Disegno_001_Configurazione_attuale}
-  \caption{Configurazione attuale}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figure/Disegno_001_Configurazione_attuale}
+  \caption{Configurazione standard}
   \label{fig:configurazione_attuale}
 \end{figure}
 
@@ -25,7 +26,7 @@ Questa pagina viene generata diversamente in base allo stato in cui si trova il 
 
 Tutte queste interazioni avvengono, attraverso chiamate http o https e sfruttano direttamente le risorse della macchina su cui \'e installato il web server.
 
-All'aumentare del numero di utenti che si collegano aumenta anche la quantit\'a di risorse che vengono utilizzate fino ad arrivare ad un punto, dipendente dall'architettura e dalle risorse presenti sulla macchina che impedisce al web server di funzionare correttamente provocando una serie di errori.
+All'aumentare del numero di utenti che si collegano aumenta anche la quantit\'a di risorse che vengono utilizzate fino ad arrivare ad un punto, dipendente dall'architettura e dalle risorse presenti sulla macchina, che impedisce al web server di funzionare correttamente provocando una serie di errori.
 
 
 \section{Possibili soluzioni}
@@ -52,7 +53,8 @@ Il lavoro che verr\'a portato avanti in questa tesi si pone come obiettivo quell
 Per far questo creeremo in layer intermedio tra il web server e i client come in Figura \ref{fig:nuova_configurazione}.
 
 \begin{figure}[!hbtp]
-	\includegraphics[width=0.5\textwidth]{figure/Disegno_002_Configurazione_desiderata.png}
+    \centering
+	\includegraphics[width=0.8\textwidth]{figure/Disegno_002_Configurazione_desiderata.png}
 	\caption{Nuova configurazione}
 	\label{fig:nuova_configurazione}
 \end{figure}
@@ -63,11 +65,11 @@ Sfortunatamente questo richieder\'a anche di cambiare il modo in cui i client e 
 
 In particolare non sar\'a pi\'u direttamente il server a generare la pagina da visualizzare sul client ma passeremo ad una gestione pi\'u dinamica della creazione delle pagine direttamente sul client in javascript con un approccio di tipo Client Side Rendering o meglio ancora DOM Manipulation.
 
-Questo approccio richiede che il client abbia un browser pi\'u moderno dato che una parte del processo viene spostata lato client. D'altro canto ormai tantissime applicazioni, come ad esempio Google mail o Facebook, hanno questo tipo di approccio.
+Questo approccio richiede che il client abbia un browser pi\'u moderno dato che una parte del processo di elaborazione viene spostata sul client. D'altro canto ormai tantissime applicazioni, come ad esempio Google mail o Facebook, hanno questo tipo di approccio.
 
 Gli scambi tra il client, il gestore di messaggi e il server PHP, avverranno quindi solo tramite messaggi codificati in JSON e non come pagine web intere. Questo ci permetter\'a, in ottica futura, di poter modificare una singola parte (client, server o gestore di messaggi) senza dover modificare obbligatoriamente le altre.
 
 \subsection{Configurazione}
-Per verificare il nostro progetto realizzeremo un server di test nel quale installeremo il server Yaws nel quale girer\'a il codice erlang ed anche una configurazione standard di apache, php, mysql (o mariadb) in modo da poter provare l'efficacia del nostro sistema.
+Per verificare il nostro progetto realizzeremo un server di test nel quale installeremo il server Yaws nel quale girer\'a il codice erlang ed anche una configurazione standard di apache, PHP, mysql (o mariadb) in modo da poter provare l'efficacia del nostro sistema.
 
-Implementeremo comunque, sia lato client, che lato server php, un set minimo di comandi sufficiente per provare la risposta del server php interrogato direttamente dal client html confrontato con la stessa configurazione ma con il gestore di messaggi inserito tra i due elementi.
+Implementeremo comunque, sia lato client, che lato server PHP, un set minimo di comandi sufficiente per provare la risposta del server PHP interrogato direttamente dal client html confrontato con la stessa configurazione ma con il gestore di messaggi inserito tra i due elementi.

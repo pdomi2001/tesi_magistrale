@@ -20,7 +20,7 @@ Per avere un riferimento stiliamo innanzitutto un elenco dei messaggi che potreb
 	\item Richiesta stato postazione
 \end{itemize}
 \subsection{Requisiti tecnici}
-Per poter poter comunicare sia lato client che lato server, visto che le comunicazioni avvengono gi\'a su http o https non useremo erlang direttamente ma ci affideremo al web server Yaws \cite{web:yaws} che \'e stato implentato proprio in Erlang e che permette di inserire all'interno del codice html, in modo simile a php, direttamente chiamate a codice erlang.
+Per poter poter comunicare sia lato client che lato server, visto che le comunicazioni avvengono gi\'a su http o https non useremo erlang direttamente ma ci affideremo al web server Yaws \cite{web:yaws} che \'e stato implentato proprio in Erlang e che permette di inserire all'interno del codice html, in modo simile a PHP, direttamente chiamate a codice erlang.
 Saremo costretti ad adattare il codice del client e del server in modo che comunichino attraverso il nuovo gestore dei messaggi.
 
 \section{Differenze tra le due modalit\'a}
@@ -34,12 +34,12 @@ La differenza principale, nella comunicazione tra client e server \'e che nella 
 
 Nella configurazione con il gestore dei messaggi invece la comunicazione avviene in modo asincrono. Il client fa una richiesta al gestore dei messaggi, questo risponde nella stessa comunicazione con l'ID con il quale la richiesta \'e stata memorizzata nella coda dei messaggi in modo che il client possa sapere quando la richiesta \'e stata processata.
 
-Ad intervalli regolari il client far\'a una richiesta al gestore dei messaggi per sapere l'esito della sua richiesta.
+Ad intervalli regolari il client far\'a una richiesta al gestore dei messaggi per conoscere l'esito della sua richiesta.
 
-La comunicazione tra gestore dei messaggi e server php la comunicazione avverr\'a in modo simile.
-Il gestore dei messaggi prender\'a uno dei messaggi dalla coda e si colleger\'a al server php. Per evitare le congestioni implementeremo un sistema che limiti il numero di processi contemporanei attivi. Se tutte le connessioni che abbiamo deciso fossero gi\'a occupate il gestore di messaggi metter\'a il messaggio di nuovo nella coda ed attendender\'a un tempo variabile prima di tentare nuovamente.
+La comunicazione tra gestore dei messaggi e server PHP avverr\'a in modo simile.
+Il gestore dei messaggi prender\'a uno dei messaggi dalla coda e si colleger\'a al server PHP. Per evitare le congestioni implementeremo un sistema che limiti il numero di processi contemporanei attivi. Se tutte le connessioni che abbiamo deciso fossero gi\'a occupate il gestore di messaggi metter\'a il messaggio di nuovo nella coda ed attendender\'a un tempo variabile prima di tentare nuovamente.
 
-Se la connessione va a buon fine il server php ci risponder\'a con il risultato della richiesta. Questa verr\'a nuovamente memorizzata nella coda dei messaggi di risposta per essere inviata al client corrispondente all'ID della richiesta originale.
+Se la connessione va a buon fine il server PHP ci risponder\'a con il risultato della richiesta. Questa verr\'a nuovamente memorizzata nella coda dei messaggi come risposta pronta per essere inviata al client corrispondente all'ID della richiesta originale.
 
 Nel caso della comunicazione con il server avremo una comunicazione sincrona anzich\'e asincrona.
 
@@ -74,7 +74,7 @@ Sul client, per l'esecuzione di un test la sequenza delle operazioni che questo 
 		\item Invio dello stato temporaneo del test (ogni 30s)*
 		\item Controllo se ci sono messaggi o azioni richieste dal server ( interruzione test, messaggio a video, ecc.)*
 	\end{itemize}
-	\item Consegna test definivo*
+	\item Consegna test definitivo*
 	\begin{itemize}
 		\item Consegna manuale prima della scadenza
 		\item Consegna per scadenza del tempo
