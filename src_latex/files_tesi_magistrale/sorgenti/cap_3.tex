@@ -1,7 +1,7 @@
 \chapter{Strutture di comunicazione}
 La comunicazione tra il client, il gestore dei messaggi e il server avvengono attraverso strutture json.
 \section{Struttura JSON}
-La struttura JSON che viene inviata per la comunicazione tra i vari elementi dovr\'a avere uno schema del tipo:
+La struttura JSON che viene inviata per la comunicazione tra i vari elementi dovr\`a avere uno schema del tipo:
 \begin{verbatim}
 {
   msg_type: tipo_messaggio,
@@ -41,7 +41,7 @@ Codifichiamo quindi i messaggi per il gestore dei messaggi:
 \label{tab:tabella_comandi}
 \end{table}
 
-Il contenuto del messaggio dipender\'a dal tipo di messaggio. Ad esempio se il tipo di messaggio \'e \textbf{\textit{test\_messaggio}} il server si aspetter\'a anche il parametro \textbf{\textbf{\textit{numero\_iterazioni}}}.
+Il contenuto del messaggio dipender\`a dal tipo di messaggio. Ad esempio se il tipo di messaggio \`e \textbf{\textit{test\_messaggio}} il server si aspetter\`a anche il parametro \textbf{\textbf{\textit{numero\_iterazioni}}}.
 
 Allo stesso modo dobbiamo codificare i messaggi di risposta dei server nel caso in cui l'esecuzione vada a buon fine:
 \begin{table}[h]
@@ -67,6 +67,6 @@ Allo stesso modo dobbiamo codificare i messaggi di risposta dei server nel caso 
 	\label{tab:tabella_comandi}
 \end{table}
 
-Nel caso in cui usiamo il gestore di messaggi, la comunicazione sar\'a asincrona per cui, una volta inviato il messaggio da parte del client, nella risposta ci sar\'a l'id della richiesta e, ad intervalli regolari, il client potr\'a verificare se la richiesta \'e andata a buon fine come indicato nella figura \ref{fig:Esempio_comunicazione_con_gestore_messaggi}.
+Nel caso in cui usiamo il gestore di messaggi, la comunicazione sar\`a asincrona per cui, una volta inviato il messaggio da parte del client, nella risposta ci sar\`a l'id della richiesta e, ad intervalli regolari, il client potr\`a verificare se la richiesta \`e andata a buon fine come indicato nella figura \ref{fig:Esempio_comunicazione_con_gestore_messaggi}.
 
 
