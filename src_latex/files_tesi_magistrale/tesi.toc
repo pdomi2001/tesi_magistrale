@@ -16,24 +16,24 @@
 \contentsline {section}{\numberline {2.3}Diagrammi degli stati}{7}{}%
 \contentsline {section}{\numberline {2.4}Perch\'e scegliere Erlang}{9}{}%
 \contentsline {subsection}{\numberline {2.4.1}Erlang/OTP}{9}{}%
-\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{11}{}%
-\contentsline {section}{\numberline {3.1}Struttura JSON}{11}{}%
-\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{13}{}%
-\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{13}{}%
-\contentsline {subsection}{\numberline {4.1.1}Lato client Javascript}{13}{}%
-\contentsline {section}{\numberline {4.2}Lato gestore dei messaggi}{15}{}%
-\contentsline {subsubsection}{Dati della Richiesta}{15}{}%
-\contentsline {subsection}{\numberline {4.2.1}Gestione delle diverse tipologie di connessione}{16}{}%
-\contentsline {subsection}{\numberline {4.2.2}Memorizzazione dei messaggi}{17}{}%
-\contentsline {section}{\numberline {4.3}Comunicazione tra gestore dei messaggi e server PHP}{20}{}%
-\contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{20}{}%
-\contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{21}{}%
-\contentsline {chapter}{\numberline {5}Verifica della funzionalit\`a}{23}{}%
-\contentsline {subsection}{\numberline {5.0.1}Verifica connessione di base}{23}{}%
-\contentsline {subsection}{\numberline {5.0.2}Verifica connessione con gestore messaggi}{23}{}%
-\contentsline {subsection}{\numberline {5.0.3}Stress test}{23}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{25}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{26}{}%
-\contentsline {section}{\numberline {A.1}Client javascript per Verifica connessione di base}{26}{}%
-\contentsline {chapter}{Bibliografia}{29}{}%
-\contentsline {chapter}{Ringraziamenti}{30}{}%
+\contentsline {chapter}{\numberline {3}Strutture di comunicazione}{12}{}%
+\contentsline {section}{\numberline {3.1}Struttura JSON}{12}{}%
+\contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{14}{}%
+\contentsline {section}{\numberline {4.1}Comunicazione tra client e gestore dei messaggi}{14}{}%
+\contentsline {subsection}{\numberline {4.1.1}Lato client Javascript}{14}{}%
+\contentsline {section}{\numberline {4.2}Lato gestore dei messaggi}{16}{}%
+\contentsline {subsubsection}{Dati della Richiesta}{16}{}%
+\contentsline {subsection}{\numberline {4.2.1}Gestione delle diverse tipologie di connessione}{17}{}%
+\contentsline {subsection}{\numberline {4.2.2}Memorizzazione dei messaggi}{18}{}%
+\contentsline {section}{\numberline {4.3}Comunicazione tra gestore dei messaggi e server PHP}{21}{}%
+\contentsline {subsection}{\numberline {4.3.1}Limitazione del numero di connessioni al server PHP}{21}{}%
+\contentsline {subsubsection}{Implementazione del codice per limitare le connessioni}{22}{}%
+\contentsline {chapter}{\numberline {5}Verifica della funzionalit\`a}{24}{}%
+\contentsline {subsection}{\numberline {5.0.1}Verifica connessione di base}{24}{}%
+\contentsline {subsection}{\numberline {5.0.2}Verifica connessione con gestore messaggi}{24}{}%
+\contentsline {subsection}{\numberline {5.0.3}Stress test}{24}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{26}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{27}{}%
+\contentsline {section}{\numberline {A.1}Client javascript per Verifica connessione di base}{27}{}%
+\contentsline {chapter}{Bibliografia}{30}{}%
+\contentsline {chapter}{Ringraziamenti}{31}{}%
