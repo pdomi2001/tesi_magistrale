@@ -115,10 +115,37 @@ L'albero di supervisione (\textit{supervision tree}) \`e una organizzazione gera
 
 Una cosa molto interessante \`e che i supervisori e i worker possono essere sulla stessa macchina ma possono anche essere messi su macchine diverse. Questo ci permette di garantire che, anche se il problema riguarda fisicamente una macchina, il sistema pu\`o continuare a funzionare, creando nuovi nodi che svolgano i compiti che venivano svolti sulla macchina non pi\`u funzionante.
 
-Tra l'altro Erlang \`e estremamente efficente. La gestione di messaggi di \textit{Whatsapp}, per esempio, viene fatta utilizzando le macchine virtuali BEAM di Erlang. 
+\subsection{Invio e ricezione di messaggi}
+Altra caratteristica estremamente interessante di Erlang \`e la gestione nativa dei messaggi.
+
+I vari processi (attori), infatti, possono comunicare tra di loro con un sistema di messaggistica nativo del linguaggio. Ad esempio per inviare un messaggio ad un altro processo \`e sufficiente il comando:
+
+\begin{verbatim}
+Pid ! Messaggio
+\end{verbatim} 
+
+Dove \textit{Pid} \`e l'id del processo a cui inviare il messaggio.
+
+Per ricevere messaggi, un processo utilizza il blocco receive, che analizza la "cassetta postale" (mailbox) del processo stesso.
+
+\begin{verbatim}
+receive
+    Pattern1 -> Azioni1;
+    Pattern2 -> Azioni2
+end
+\end{verbatim} 
+
+a seconda del \textit{pattern} ricevuto verr\`a eseguita l'azione corrispondente. 
+
+\subsection{Hot Code Swapping}
+Un'altra caratteristica interessante di erlang rispetto ad altri linguaggi \`e la sua capacit\`a di aggiornare il codice di una applicazione mentre questa \`e in esecuzione (\textit{Hot Code Swapping}), senza interrompere il servizio. I nuovi processi utilizzeranno il nuovo codice, mentre quelli vecchi continueranno con la versione precedente finch\`e non terminano o vengono aggiornati.
+
+
+\subsection{Casi d'uso - Whatsapp}
+Erlang \`e estremamente efficente e ne abbiamo prova, ad esempio, dal fatto che la gestione di messaggi dell'applicazione di messaggistica \textit{Whatsapp} viene fatta utilizzando le macchine virtuali BEAM di Erlang.
+
 La capacit\`a di gestire una elevata concorrenza permette ad ogni server di gestire fino a 2 milioni di connessioni contemporanee. Questo gli permette, con un team estremamente ridotto, di gestire tranquillamente oltre 100 miliardi di messaggi al giorno mantenendo, grazie alla struttura \textit{fault-tolerant}, una enorme affidabilit\`a e tolleranza ai guasti.
 
-Un'altra caratteristica interessante di erlang rispetto ad altri linguaggi \`e la sua capacit\`a di aggiornare il codice di una applicazione mentre questa \`e in esecuzione (\textit{Hot Code Swapping}), senza interrompere il servizio. I nuovi processi utilizzeranno il nuovo codice, mentre quelli vecchi continueranno con la versione precedente finch\`e non terminano o vengono aggiornati.
 
 
 

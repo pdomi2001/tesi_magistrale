@@ -16,6 +16,9 @@
 \contentsline {section}{\numberline {2.3}Diagrammi degli stati}{7}{}%
 \contentsline {section}{\numberline {2.4}Perch\'e scegliere Erlang}{9}{}%
 \contentsline {subsection}{\numberline {2.4.1}Erlang/OTP}{9}{}%
+\contentsline {subsection}{\numberline {2.4.2}Invio e ricezione di messaggi}{10}{}%
+\contentsline {subsection}{\numberline {2.4.3}Hot Code Swapping}{11}{}%
+\contentsline {subsection}{\numberline {2.4.4}Casi d'uso - Whatsapp}{11}{}%
 \contentsline {chapter}{\numberline {3}Strutture di comunicazione}{12}{}%
 \contentsline {section}{\numberline {3.1}Struttura JSON}{12}{}%
 \contentsline {chapter}{\numberline {4}Implementazione della comunicazione}{14}{}%
