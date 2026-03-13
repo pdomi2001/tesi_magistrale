@@ -114,13 +114,13 @@
 					is_binary(Id)  -> binary_to_integer(Id);
 					true           -> 0
 				end,
-				case leggi_richiesta(Id) of
+				case leggi_richiesta(IdNum) of
 					{ok, Result} ->
 						Parametri_res = #{
 						<<"result_type">> => <<"test_result_r">>,
 						<<"result_content">> => #{
 								<<"result_desc">> => <<"reading_result">>,
-								<<"content">> => IdBinary
+								<<"content">> => record_to_map(Result)
 								}
 						};
 					{error, not_found} ->
@@ -241,6 +241,27 @@ leggi_richiesta(Id) ->
             % Errore Mnesia
             {error, Reason}
     end.
+    
+leggi_richiesta_2(Id) ->
+    try mnesia:dirty_read(richiesta, Id) of
+        [R] -> {ok, R};
+        []  -> {error, not_found}
+    catch
+        _:Reason -> {error, Reason}
+    end. 
+    
+leggi_richiesta_3(Id) ->
+    MatchPattern = [{
+        {richiesta, Id, '_', '_', '_', '_'},
+        [],
+        ['$_']
+    }],
+    case mnesia:transaction(fun() -> mnesia:select(richiesta, MatchPattern) end) of
+        {atomic, [R]} -> {ok, R};
+        {atomic, []}  -> {error, not_found};
+        {aborted, Reason} -> {error, Reason}
+    end.    
+       
 
 % UPDATE - aggiorna lo stato
 aggiorna_stato(Id, NuovoStato) ->

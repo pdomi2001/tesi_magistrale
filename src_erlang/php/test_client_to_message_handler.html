@@ -115,6 +115,10 @@
 				/* passo a controllare se il risultato della richiesta al server è arrivato */
 				document.getElementById("return_message").innerHTML = JSON.stringify(post_res.risposta.result_content);
 			}
+			if (post_res.risposta.result_type == "test_result_r") {
+				/* passo a controllare se il risultato della richiesta al server è arrivato */
+				document.getElementById("return_message").innerHTML = JSON.stringify(post_res.risposta.result_content);
+			}
 			
 			console.log("prossimo comando :" + msg_type);
 		});
