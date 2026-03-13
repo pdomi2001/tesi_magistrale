@@ -109,6 +109,11 @@
 					is_binary(Id)  -> Id;
 					true           -> <<"id_non_valido">>
 				end,
+				IdNum = if
+					is_integer(Id) -> Id;
+					is_binary(Id)  -> binary_to_integer(Id);
+					true           -> 0
+				end,
 				case leggi_richiesta(Id) of
 					{ok, Result} ->
 						Parametri_res = #{
@@ -136,6 +141,11 @@
 						}
 				end,
 				Parametri_res;
+			<<"elenco_record_mnesia">> ->
+				Parametri_res = #{
+					<<"result_type">> => <<"elenco_tabella_mnesia_result">>,
+					<<"result_content">> => leggi_tabella_mnesia()
+				};
 			<<"registra_postazione">> ->
 				Parametri_res = #{
 					<<"result_type">> => <<"registration_result">>,
@@ -245,4 +255,24 @@ elimina_richiesta(Id) ->
         mnesia:delete({richiesta, Id})
     end).
 
+% Legge tutti i record della tabella
+leggi_tabella_mnesia() ->
+    {atomic, Records} = mnesia:transaction(fun() ->
+        mnesia:select(richiesta, [{'_', [], ['$_']}])
+    end),
+    % Converte ogni record in una mappa
+    Lista = lists:map(fun(R) -> record_to_map(R) end, Records),
+    #{
+        <<"result">>  => <<"ok">>,
+        <<"count">>   => length(Lista),
+        <<"records">> => Lista
+    }.
+record_to_map(R) ->
+    #{
+        <<"id">>        => element(2, R),
+        <<"msg_type">>  => element(3, R),
+        <<"payload">>   => element(4, R),
+        <<"stato">>     => atom_to_binary(element(5, R), utf8),
+        <<"timestamp">> => list_to_binary(io_lib:format("~p", [element(6, R)]))
+    }.
 </erl>

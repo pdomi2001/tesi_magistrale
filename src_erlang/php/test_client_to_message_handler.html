@@ -56,6 +56,7 @@
 	/* Invio i messaggi */
 	function InvioMessaggio()
 	{
+		console.log("----\nNumero iterazione " + numero_iterazioni + "\n---");
 		switch (msg_type) {
 			case "test_message_m":
 				dati = 
@@ -71,6 +72,15 @@
 				dati = 
 				{ 
 					"msg_type": "test_message_r", 
+					"msg_content": {
+						"id": id_message 
+					}
+				};
+				break;
+			case "elenco_record_mnesia":
+				dati = 
+				{ 
+					"msg_type": "elenco_record_mnesia", 
 					"msg_content": {
 						"id": id_message 
 					}
@@ -97,7 +107,15 @@
 			if (post_res.risposta.result_type == "test_result_m") {
 				/* passo a controllare se il risultato della richiesta al server è arrivato */
 				msg_type = "test_message_r";
+				/* 
+				msg_type = "elenco_record_mnesia";
+				*/
 			}
+			if (post_res.risposta.result_type == "elenco_tabella_mnesia_result") {
+				/* passo a controllare se il risultato della richiesta al server è arrivato */
+				document.getElementById("return_message").innerHTML = JSON.stringify(post_res.risposta.result_content);
+			}
+			
 			console.log("prossimo comando :" + msg_type);
 		});
 /*
@@ -120,7 +138,9 @@
 		numero_iterazioni = numero_iterazioni + 1;
 
 	  /* faccio ripartire il timer per la prossima iterazione */
-  	  t_invio_messaggi = setTimeout('InvioMessaggio()', invio_messaggi_refresh_time); 
+	  if (numero_iterazioni < 2) {
+		t_invio_messaggi = setTimeout('InvioMessaggio()', invio_messaggi_refresh_time); 
+	  }
 	}
 
 	
