@@ -7,7 +7,8 @@
 <body>
 	<h1>Client di prova per verificare la comunicazione con il web server php tramite il gestore di messaggi</h1>
 	
-	<p><a href="javascript:StartInvioMessaggi()">Inizia invio dei messaggi al gestore messaggi.</a></p>
+	<p><a href="javascript:StartInvioMessaggi('test_message_m')">Inizia invio dei messaggi al gestore messaggi.</a></p>
+	<p><a href="javascript:StartInvioMessaggi('elenco_record_mnesia')">Inizia invio dei messaggi al gestore messaggi per elenco database mnesia.</a></p>
 	<!-- 
 	<p><a href="">Registrazione postazione sulla piattaforma</a></p>
 	<p><a href="">De-Registrazione postazione sulla piattaforma</a></p>
@@ -19,8 +20,6 @@
 	
 	<div>Test POST con parametri Yaws: <span id="post_parametri"></span></div>
 	<div style="border: 1px solid black;" id="return_message"></div>
-	<div>Test POST con parametri PHP: <span id="post_parametri_php"></span></div>
-	<div style="border: 1px solid black;" id="return_message_php"></div>
 	
 	<script src="utils.js">	</script>
 	<script>		
@@ -37,14 +36,10 @@
 	
 	var msg_type = "test_message_m";
 
-	/* function StartInvioMessaggi(webpage, session_id) { */
-	function StartInvioMessaggi() {
+	/* Inizia l'invio dei messaggi */
+	function StartInvioMessaggi(start_message) {
 		clearTimeout(t_invio_messaggi);
-		/*
-		keepalive_webpage = webpage;
-		keepalive_session_id = session_id;
-		*/
-
+		msg_type = start_message;
 		t_invio_messaggi = setTimeout('InvioMessaggio()', invio_messaggi_refresh_time_first_time); 
 	}
 
@@ -122,22 +117,6 @@
 			
 			console.log("prossimo comando :" + msg_type);
 		});
-/*
-		const dati_php = 
-		{ 
-			"msg_type": "test_message", 
-			"msg_content": {
-				"numero_iterazioni": numero_iterazioni, 
-				"test": "Sara" 
-			}
-		};
-		post(server_php, dati_php).then((post_res) => {
-			document.getElementById("post_parametri_php").innerHTML = post_res.risposta.result_type;
-			document.getElementById("return_message_php").innerHTML = post_res.risposta.result_content;
-			console.log("msg-arrived_php:" + post_res.risposta.result_type);
-			console.log("post_res_php:" + post_res.risposta.result_content);
-		});
-*/
 
 		numero_iterazioni = numero_iterazioni + 1;
 
@@ -146,10 +125,6 @@
 		t_invio_messaggi = setTimeout('InvioMessaggio()', invio_messaggi_refresh_time); 
 	  }
 	}
-
-	
-
-		
 		get(server).then((post) => {
 			document.getElementById("get").innerHTML = post.result;
 		});
