@@ -1,0 +1,16 @@
+<erl>
+ 
+out(A) ->
+    NodoCorrente = node(),
+    NodiConnessi = nodes(),
+    Tabelle = mnesia:system_info(tables),
+    
+    Html = io_lib:format("
+        <b>Nodo corrente:</b> ~p <br/>
+        <b>Nodi connessi:</b> ~p <br/>
+        <b>Tabelle Mnesia:</b> ~p
+    ", [NodoCorrente, NodiConnessi, Tabelle]),
+    
+    {html, Html}.
+    
+</erl>

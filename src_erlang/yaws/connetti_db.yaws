@@ -1,0 +1,21 @@
+<erl>
+out(A) ->
+    % Connetti la VM di Yaws al nodo esterno
+    case net_kernel:connect_node('app@localhost') of
+        true ->
+            % Connessione riuscita, ora aggiungi il nodo a Mnesia
+            mnesia:change_config(extra_db_nodes, ['app@localhost']),
+            
+            % Replica le tabelle sul nodo esterno
+            Tables = mnesia:system_info(tables) -- [schema],
+            lists:foreach(fun(T) ->
+                mnesia:add_table_copy(T, 'app@localhost', ram_copies)
+            end, Tables),
+            
+            {html, "Nodo connesso e tabelle replicate!"};
+        false ->
+            {html, "Connessione fallita"};
+        ignored ->
+            {html, "Nodo non distribuito - assicurati di avviare Yaws con -name"}
+    end.
+</erl>
