@@ -179,6 +179,7 @@
 		.
 
 	out(Arg) ->
+		Result_Init_DB = esegui_inizializzazione(),
 		Method = method(Arg),
 		Risultato = try
 			processa_comandi(Method, Arg)
@@ -296,4 +297,55 @@ record_to_map(R) ->
         <<"stato">>     => atom_to_binary(element(5, R), utf8),
         <<"timestamp">> => list_to_binary(io_lib:format("~p", [element(6, R)]))
     }.
+    
+%
+% Inizializzazione del DB
+%    
+esegui_inizializzazione() ->
+    Passi = [
+        {"schema",  fun crea_schema/0},
+        {"mnesia",  fun avvia_mnesia/0},
+        {"tabelle", fun crea_tabelle/0}
+    ],
+    Risultati = lists:map(fun({Nome, Funzione}) ->
+        Esito = try
+            Funzione(),
+            <<"ok">>
+        catch
+            _:Motivo -> list_to_binary(io_lib:format("~p", [Motivo]))
+        end,
+        {list_to_binary(Nome), Esito}
+    end, Passi),
+
+    application:set_env(yaws, db_inizializzato, true),
+
+    maps:from_list([
+        {<<"result">>, <<"ok">>},
+        {<<"passi">>,  maps:from_list(Risultati)}
+    ]).
+
+crea_schema() ->
+    case mnesia:create_schema([node()]) of
+        ok -> ok;
+        {error, {_, {already_exists, _}}} -> already_exists
+    end.
+
+avvia_mnesia() ->
+    case mnesia:start() of
+        ok -> ok;
+        {error, {already_started, _}} -> already_started
+    end.
+
+crea_tabelle() ->
+    case mnesia:create_table(richiesta, [
+        {attributes, [id, msg_type, payload, stato, timestamp]},
+        {type, set},
+        %{disc_copies, [node()]}
+        {ram_copies, [node()]}
+    ]) of
+        {atomic, ok}                    -> ok;
+        {aborted, {already_exists, _}}  -> already_exists
+    end.
+    
+    
 </erl>
