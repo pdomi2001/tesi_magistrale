@@ -1,0 +1,51 @@
+<erl>
+	out(Arg) ->
+		JsonBody = iolist_to_binary(json:encode(#{
+			<<"msg_type">> =>  <<"test_message">>, 
+			<<"msg_content">> =>  #{
+					<<"numero_iterazioni">> => <<"1">>, 
+					<<"test">> => <<"Pippo">> 
+				}
+		})),
+		Risultato = json:encode(send_http_request(JsonBody)),
+		%% Definiamo l'header CORS
+		% Sostituisci "*" con "https://tuosito.com" per maggiore sicurezza
+		ACAO = {header, {"Access-Control-Allow-Origin", "*"}},
+		
+		%% Altri header comuni per le API
+		ContentType = {header, {"Content-Type", "application/json"}},
+		% Torno gli header per evitare ACAO
+		[
+			ACAO,
+			ContentType,		
+			{content, "application/json", Risultato}
+		]
+		.   
+send_http_request(JsonBody) ->
+	% Ci assicuriamo che inets sia avviato
+	application:ensure_all_started(inets),
+	application:ensure_all_started(ssl),
+
+
+	% Content-Type deve essere application/json
+	ContentType = "application/json; charset=utf-8",
+	Url = "http://localhost/server.php",
+
+	case httpc:request(post,
+			{Url, [], ContentType, JsonBody},
+			[{timeout, 5000}],
+			[]) of
+		{ok, {{_, StatusCode, _}, _Headers, ResponseBody}} ->
+			DecodedResponse = json:decode(iolist_to_binary(ResponseBody)),
+			JsonBodyReturn = #{
+			<<"Status">> => integer_to_binary(StatusCode),
+			<<"Risposta">> => DecodedResponse
+			},
+			JsonBodyReturn;
+		{error, Reason} ->
+			io:format("Errore: ~p", [Reason])
+	end
+.
+
+
+</erl>

@@ -8,3 +8,5 @@
 *.lot
 
 *.synctex.gz
+
+*.dump

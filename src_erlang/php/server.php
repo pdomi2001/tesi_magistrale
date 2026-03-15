@@ -1,4 +1,3 @@
-
 <?php
 function GetRequestMethod() {
     return $_SERVER['REQUEST_METHOD'];
@@ -37,7 +36,7 @@ function HandlePost() {
 
     $msg_type = $payload['msg_type'] ?? 'sconosciuto';
 
-	SendJsonResponse(['result' => $payload, 'risposta' => GetRisposta($payload), 'id' => $mio_id]);
+	SendJsonResponse(['result' => $payload, 'risposta' => GetRisposta($payload)]);
         /*
     switch ($msg_type) {
         case 'test_messaggio':
@@ -121,6 +120,18 @@ function GetRisposta($payload) {
 				"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
 			];
 			break;
+		case "test_message_m":
+			$result = [
+				"result_type" => "test_result_r",
+				"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+			];
+			break;
+        case "registra_postazione":
+			$result = [
+				"result_type" => "registra_posizione_result",
+				"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+			];
+            break;
 		default:
 			$result = [
 				"result_type" => "not_found",
@@ -133,7 +144,7 @@ function GetRisposta($payload) {
 function SendJsonResponse($data, $status_code = 200) {
     http_response_code($status_code);
     header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: *'); // stesso header CORS che usi in YAWS
+    header('Access-Control-Allow-Origin: *'); // stesso header CORS che usiamo in YAWS
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }

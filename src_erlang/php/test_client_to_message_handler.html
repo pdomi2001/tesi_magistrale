@@ -8,7 +8,8 @@
 	<h1>Client di prova per verificare la comunicazione con il web server php tramite il gestore di messaggi</h1>
 	
 	<p><a href="javascript:StartInvioMessaggi('test_message_m')">Inizia invio dei messaggi al gestore messaggi.</a></p>
-	<p><a href="javascript:StartInvioMessaggi('elenco_record_mnesia')">Inizia invio dei messaggi al gestore messaggi per elenco database mnesia.</a></p>
+	<p><a href="javascript:StopInvioMessaggi()">Ferma l'invio dei messaggi al gestore messaggi.</a></p>
+	<p><a href="javascript:StartInvioMessaggi('elenco_record_mnesia')">Chiede al gestore messaggi per elenco database mnesia.</a></p>
 	<!-- 
 	<p><a href="">Registrazione postazione sulla piattaforma</a></p>
 	<p><a href="">De-Registrazione postazione sulla piattaforma</a></p>
@@ -16,7 +17,7 @@
 	<h2>Test javascript</h2>
 	-->
 	<p>Test get Yaws: <span id="get"></span></p>
-	<p>Test get PHP: <span id="get_php"></span></p>
+	<p>Numero iterazioni: <span id="iterazioni"></span></p>
 	
 	<div>Test POST con parametri Yaws: <span id="post_parametri"></span></div>
 	<div style="border: 1px solid black;" id="return_message"></div>
@@ -40,7 +41,8 @@
 	function StartInvioMessaggi(start_message) {
 		clearTimeout(t_invio_messaggi);
 		msg_type = start_message;
-		t_invio_messaggi = setTimeout('InvioMessaggio()', invio_messaggi_refresh_time_first_time); 
+		numero_iterazioni = 0;
+		t_invio_messaggi = setTimeout('InvioMessaggio(-1)', invio_messaggi_refresh_time_first_time); 
 	}
 
 	/* termina l'invio dei messaggi */
@@ -49,7 +51,7 @@
 	}
 
 	/* Invio i messaggi */
-	function InvioMessaggio()
+	function InvioMessaggio(id_message_to_check)
 	{
 		console.log("----\nNumero iterazione " + numero_iterazioni + "\n---");
 		switch (msg_type) {
@@ -68,7 +70,16 @@
 				{ 
 					"msg_type": "test_message_r", 
 					"msg_content": {
-						"id": id_message 
+						"id": id_message_to_check 
+					}
+				};
+				break;
+			case "delete_request":
+				dati = 
+				{ 
+					"msg_type": "delete_message", 
+					"msg_content": {
+						"id": id_message_to_check 
 					}
 				};
 				break;
@@ -77,7 +88,7 @@
 				{ 
 					"msg_type": "elenco_record_mnesia", 
 					"msg_content": {
-						"id": id_message 
+						"id": id_message_to_check 
 					}
 				};
 				break;
@@ -93,14 +104,15 @@
 			
 		}
 		console.log("Dati inviati:" + JSON.stringify(dati));
+		var restart_timer = true;
 		post(server, dati).then((post_res) => {
 			document.getElementById("post_parametri").innerHTML = post_res.risposta.result_type;
 			document.getElementById("return_message").innerHTML = post_res.risposta.result_content.result_desc + " - " + post_res.risposta.result_content.id_message;
-			id_message = post_res.risposta.result_content.id_message;
 			console.log("msg-arrived:" + post_res.risposta.result_type);
 			console.log("post_res :" + JSON.stringify(post_res.risposta.result_content));
 			if (post_res.risposta.result_type == "test_result_m") {
 				/* passo a controllare se il risultato della richiesta al server è arrivato */
+				id_message_to_check = post_res.risposta.result_content.id_message;
 				msg_type = "test_message_r";
 				/* 
 				msg_type = "elenco_record_mnesia";
@@ -112,18 +124,34 @@
 			}
 			if (post_res.risposta.result_type == "test_result_r") {
 				/* passo a controllare se il risultato della richiesta al server è arrivato */
+				if (post_res.risposta.result_content.content.stato == "completata") { 
+				/* if (post_res.risposta.result_content.content.stato == "in_attesa") { */
+					/* cancello la richiesta dal database */
+					msg_type = "delete_request";
+					id_message_to_check = post_res.risposta.result_content.content.id;
+				} else {
+					/* la richiesta non è stata ancora processata. controlliamo di nuovo alla scadenza del timer */
+					msg_type = "test_message_r";
+				}	
+				document.getElementById("return_message").innerHTML = JSON.stringify(post_res.risposta.result_content);
+			}
+			/* il dato e' stato cancellato */
+			if (post_res.risposta.result_type == "delete_request_r") {
+				/* fermo la ricerca del risultato del messaggio */
+				restart_timer = false;
 				document.getElementById("return_message").innerHTML = JSON.stringify(post_res.risposta.result_content);
 			}
 			
 			console.log("prossimo comando :" + msg_type);
+			numero_iterazioni = numero_iterazioni + 1;
+			document.getElementById("iterazioni").innerHTML = numero_iterazioni;
+
+			/* faccio ripartire il timer per la prossima iterazione */
+			if (restart_timer) {
+				t_invio_messaggi = setTimeout('InvioMessaggio(' + id_message_to_check + ')', invio_messaggi_refresh_time); 
+			}
 		});
 
-		numero_iterazioni = numero_iterazioni + 1;
-
-	  /* faccio ripartire il timer per la prossima iterazione */
-	  if (numero_iterazioni < 2) {
-		t_invio_messaggi = setTimeout('InvioMessaggio()', invio_messaggi_refresh_time); 
-	  }
 	}
 		get(server).then((post) => {
 			document.getElementById("get").innerHTML = post.result;

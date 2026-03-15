@@ -116,6 +116,7 @@
 				end,
 				case leggi_richiesta(IdNum) of
 					{ok, Result} ->
+						Status = element(5, Result),
 						Parametri_res = #{
 						<<"result_type">> => <<"test_result_r">>,
 						<<"result_content">> => #{
@@ -134,6 +135,38 @@
 					{error, Reason} ->
 						Parametri_res = #{
 						<<"result_type">>  => <<"error">>,
+						<<"result_content">> => #{
+								<<"result_desc">> => <<"id non trovato">>,
+								<<"content">> => list_to_binary(io_lib:format("~p", [Reason]))
+								}
+						}
+				end,
+				Parametri_res;
+			<<"delete_message">> ->
+				% Leggi la richiesta in Mnesia
+				Id = maps:get(<<"id">>, Msg_content, 0),
+				IdBinary = if
+					is_integer(Id) -> integer_to_binary(Id);
+					is_binary(Id)  -> Id;
+					true           -> <<"id_non_valido">>
+				end,
+				IdNum = if
+					is_integer(Id) -> Id;
+					is_binary(Id)  -> binary_to_integer(Id);
+					true           -> 0
+				end,
+				case elimina_richiesta(IdNum) of
+					{atomic, ok} ->
+						Parametri_res = #{
+						<<"result_type">> => <<"delete_request_r">>,
+						<<"result_content">> => #{
+								<<"result_desc">> => <<"delete_result">>,
+								<<"content">> => <<"elemento cancellato">>
+								}
+						};
+					{aborted, Reason} ->
+						Parametri_res = #{
+						<<"result_type">>  => <<"delete_error">>,
 						<<"result_content">> => #{
 								<<"result_desc">> => <<"id non trovato">>,
 								<<"content">> => list_to_binary(io_lib:format("~p", [Reason]))
@@ -269,6 +302,13 @@ aggiorna_stato(Id, NuovoStato) ->
     mnesia:transaction(fun() ->
         [R] = mnesia:read(richiesta, Id),
         mnesia:write(R#richiesta{stato = NuovoStato})
+    end).
+
+% UPDATE - aggiorna il payload
+aggiorna_payload(Id, NuovoPayLoad) ->
+    mnesia:transaction(fun() ->
+        [R] = mnesia:read(richiesta, Id),
+        mnesia:write(R#richiesta{payload = NuovoPayLoad})
     end).
 
 % DELETE - rimuovi una richiesta completata
