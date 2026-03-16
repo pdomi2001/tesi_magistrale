@@ -168,7 +168,7 @@ processa_comandi('GET', _Arg) ->
 \end{verbatim}
 
 \subsection{Memorizzazione dei messaggi}
-Per memorizzare i messaggi in transito tra il client e il server, avvenendo la comunicazione in modo asincrono, ci avveleremo del database nativo erlang mnesia \cite{web:mnesia} che ci permetter\`a di memorizzare in modo efficace i vari comandi da inviare al server PHP ed anche le risposte di questo da inviare al client javascript.
+Per memorizzare i messaggi in transito tra il client e il server, avvenendo la comunicazione in modo asincrono, ci avvarremo del database nativo erlang mnesia \cite{web:mnesia} che ci permetter\`a di memorizzare in modo efficace i vari comandi da inviare al server PHP ed anche le risposte di questo da inviare al client javascript.
 
 Dato che i messaggi inviati dal client e quelli resituiti dal server hanno una struttura simile e che i codici dei messaggi non sono sovrapponibili useremo una sola tabella per la coda dei messaggi.
 
@@ -195,7 +195,7 @@ I record della tabella avranno la seguente struttura:
 	\label{tab:tabella_mnesia}
 \end{table}
 
-Creiamo quindi un file che permetta di inizializzare il database che dovr\`a contenere la tabella mnesia.
+Creiamo quindi il codice che permetta di inizializzare il database che dovr\`a contenere la tabella mnesia.
 
 \begin{verbatim}
 out(Arg) ->
@@ -299,10 +299,88 @@ Nel codice erlang del server yaws mettiamo la gestione di scrittura e lettura de
 		Parametri_res;
 \end{verbatim}
 
-come si pu\`o notare, per poter mantenere la struttura che abbiamo creato per fare i primi test, cambieremo la tipologia dei messaggi che il client dovr\`a inviare al gestore dei messaggi: \textit{\textbf{test\_message\_m}} \`e il messaggio che il client dovr\`a inviare al gestore dei messaggi per effettuare il test\
+come si pu\`o notare, per poter mantenere la struttura che abbiamo creato per fare i primi test, cambieremo la tipologia dei messaggi che il client dovr\`a inviare al gestore dei messaggi: \textit{\textbf{test\_message\_m}} \`e il messaggio che il client dovr\`a inviare al gestore dei messaggi per effettuare il test, mentre, per controllare lo stato di esecuzione del messaggio useremo \textbf{\textit{test\_message\_r}} che restituir\`a, in caso positivo, l'esito dell'esecuzione.
 
+Il client, se la risposta ricevuta dovesse essere che il messaggio non \`e stato ancora elaborato, attiver\`a di nuovo il timer per controllare lo stato di esecuzione del comando dopo un certo tempo.
+
+\section{Invio dei messaggi da parte del gestore dei messaggi}
+L'invio delle richieste dal gestore dei messaggi al server PHP pu\`o avvenire in diversi modi. Quello che utilizzeremo noi in questa prova consiste nel mandare i messaggi in modo sincrono quando un client chiede se la propria richiesta \'e stata processata.
+
+In alternativa la comunicazione potrebbe avvenire attraverso un agente Erlang esterno che processi in modo autonomo. Questa opzione \`e pi\`u complicata da impostare ma \`e in grado di fornire un grado di scalabilit\`a e affidabilit\`a maggiore.
+
+\subsection{Comunicazione sincrona}
+Nel nostro caso sfrutteremo il fatto di aver aggiunto, alla tabella del nostro database \textit{mnesia}, lo stato di elaborazione del messaggio. I tre stati che possiamo usare sono: in\_attesa, in elaborazione e completata.
+ 
+Il messaggio, la prima volta che viene inserito nella tabella, avr\`a come valore \textit{\textbf{in\_attesa}} che sta ad indicare che il messaggio non \`e stato ancora processato.
+
+La parte di funzione che si occupa di processare questo \`e il seguente:
+
+\begin{verbatim}
+<<"test_message_r">> ->
+	% Leggi la richiesta in Mnesia
+	Id = maps:get(<<"id">>, Msg_content, 0),
+	IdBinary = if
+		is_integer(Id) -> integer_to_binary(Id);
+		is_binary(Id)  -> Id;
+		true           -> <<"id_non_valido">>
+	end,
+	IdNum = if
+		is_integer(Id) -> Id;
+		is_binary(Id)  -> binary_to_integer(Id);
+		true           -> 0
+	end,
+	case leggi_richiesta(IdNum) of
+		{ok, Result} ->
+			Status = element(5, Result), % in_attesa | in_elaborazione | completata
+			NewStatus = case Status of
+				"in_attesa" -> 
+					% non è ancora stato elaborato il comando
+					% cambiamo lo stato in in_elaborazione in modo che al prossimo passo
+					% venga inviato al server PHP
+					Result_elab = Result,
+					binary_to_atom(<<"in_elaborazione">>);
+				"in_elaborazione" -> 
+					% mi collego al server php per eseguire il comando
+					case ConnettiAlServerPHP(Result) of
+					{ok, Result_elab} -> binary_to_atom(<<"completata">>);
+					{busy, _} -> 
+					Result_elab = Result,
+					binary_to_atom(<<"in_elaborazione">>);
+					end;
+				"completata" -> 
+					Result_elab = Result,
+					binary_to_atom(<<"in_elaborazione">>)
+			end,
+			case aggiorna_stato(Id, NewStatus) of
+				{atomic, ok} ->
+					ok;
+				{aborted, Reason} ->
+					{error, Reason}
+			end,
+	Parametri_res = #{
+		<<"result_type">> => <<"test_result_r">>,
+		<<"result_content">> => #{
+			<<"result_desc">> => <<"reading_result">>,
+			<<"content">> => record_to_map(Result_elab)
+		}
+	};
+	
+\end{verbatim}
+
+Quando il client ci chiede se ci sono risposte alla sua richiesta, nel nostro caso \textbf{\textit{test\_message}}, andiamo a leggere lo stato corrispondente alla richiesta con identificativo \textit{\textbf{Id}}.
+
+Se lo status era \textit{in\_attesa} lo cambiamo con \textit{in\_elaborazione}.
+La volta successiva che il client ci far\`a la richiesta di conoscere il risultato della sua richiesta invieremo la richiesta al server PHP che, in caso riesca ad elaborare la richiesta la segner\`a come \textit{\textbf{completata}} nella tabella delle richieste.
+
+Il client, nella iterazione successiva, trovando che quel particolare Id \`e stato completato chieder\`a al gestore dei messaggi di cancellare quello con l'Id che non serve pi\`u. 
+
+\subsubsection{Invio di dati da erlang al server PHP}
+ Per spedire i dati al server
+ 
+ 
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
+
 \subsection{Limitazione del numero di connessioni al server PHP}
 Ci sono diversi metodi per limitare il numero connessioni che il server PHP accetta dal gestore dei messaggi. Alcuni dei pi\`u comuni sono:
 \begin{itemize}
@@ -384,4 +462,42 @@ function UnLockSlot($db, $mio_id) {
 }   
 
 \end{verbatim}
+
+\subsection{Ricezione e gestione dei messaggi nel server PHP}
+La gestione dei messaggi in PHP avviene in modo analogo a quello che abbiamo implementato in Erlang con lo dovute differenze dovute al linguaggio di programmazione.
+
+La funzione principale, dopo che i dati \textit{json} sono stati estratti dal parametro POST \`e quella che , in base al tipo di messaggio ricevuto, esegue il codice necessario e torna indietro il risultato dell'elaborazione in modo che questo possa essere recuperato, al prossimo controllo, dal client javascript.
+
+\begin{verbatim}
+	function GetRisposta($payload) {
+		switch ($payload["msg_type"]) {
+			case "test_message":
+				$result = [
+					"result_type" => "test_result",
+					"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+				];
+			break;
+			case "test_message_m":
+				$result = [
+					"result_type" => "test_result_r",
+					"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+				];
+			break;
+			case "registra_postazione":
+				$result = [
+					"result_type" => "registra_posizione_result",
+					"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+				];
+				break;
+			default:
+				$result = [
+					"result_type" => "not_found",
+					"result_content" => $payload["msg_type"]
+				];
+		} 
+		return $result;
+	}
+	
+\end{verbatim}
+
 

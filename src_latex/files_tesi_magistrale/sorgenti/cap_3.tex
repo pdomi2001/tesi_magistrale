@@ -69,4 +69,27 @@ Allo stesso modo dobbiamo codificare i messaggi di risposta dei server nel caso 
 
 Nel caso in cui usiamo il gestore di messaggi, la comunicazione sar\`a asincrona per cui, una volta inviato il messaggio da parte del client, nella risposta ci sar\`a l'id della richiesta e, ad intervalli regolari, il client potr\`a verificare se la richiesta \`e andata a buon fine come indicato nella figura \ref{fig:Esempio_comunicazione_con_gestore_messaggi}.
 
+\section{Struttura Record in Erlang}
+In erlang avremo diverse strutture interne che saranno poi convertire in JSON. Quanto utilizziamo la libreria \textit{json} il testo json viene convertito in una mappa e viceversa.
+La mappa che viene resituita \`e del tipo:
 
+\begin{verbatim}
+	Parametri_res = #{
+		<<"result_type">> => <<"test_result_r">>,
+		<<"result_content">> => #{
+			<<"result_desc">> => <<"reading_result">>,
+			<<"content">> => record_to_map(Result)
+		} 		
+\end{verbatim}
+
+In questo caso particolare il contenuto, nel campo \textit{content}, \`e creato dai dati letti dal database \textit{mnesia}. Questo restituisce un dato di tipo record che viene a sua volta convertito in mappa.
+
+\begin{verbatim}
+	    #{
+		<<"id">>        => element(2, R),
+		<<"msg_type">>  => element(3, R),
+		<<"payload">>   => element(4, R),
+		<<"stato">>     => atom_to_binary(element(5, R), utf8),
+		<<"timestamp">> => list_to_binary(io_lib:format("~p", [element(6, R)]))
+	}.
+\end{verbatim}

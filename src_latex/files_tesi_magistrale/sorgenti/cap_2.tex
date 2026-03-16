@@ -113,7 +113,7 @@ L'albero di supervisione (\textit{supervision tree}) \`e una organizzazione gera
 	\label{fig:erlang-otp-supervision-tree}
 \end{figure}
 
-Una cosa molto interessante \`e che i supervisori e i worker possono essere sulla stessa macchina ma possono anche essere messi su macchine diverse. Questo ci permette di garantire che, anche se il problema riguarda fisicamente una macchina, il sistema pu\`o continuare a funzionare, creando nuovi nodi che svolgano i compiti che venivano svolti sulla macchina non pi\`u funzionante.
+Una cosa molto interessante \`e che i \textit{supervisor} e i \textit{worker} possono essere sulla stessa macchina ma possono anche essere messi su macchine diverse. Questo ci permette di garantire che, anche se il problema riguarda fisicamente una macchina, il sistema pu\`o continuare a funzionare, creando nuovi nodi che svolgano i compiti che venivano svolti sulla macchina non pi\`u funzionante.
 
 \subsection{Invio e ricezione di messaggi}
 Altra caratteristica estremamente interessante di Erlang \`e la gestione nativa dei messaggi.
@@ -146,6 +146,78 @@ Erlang \`e estremamente efficente e ne abbiamo prova, ad esempio, dal fatto che 
 
 La capacit\`a di gestire una elevata concorrenza permette ad ogni server di gestire fino a 2 milioni di connessioni contemporanee. Questo gli permette, con un team estremamente ridotto, di gestire tranquillamente oltre 100 miliardi di messaggi al giorno mantenendo, grazie alla struttura \textit{fault-tolerant}, una enorme affidabilit\`a e tolleranza ai guasti.
 
+\subsection{Esempio codice del framework OTP}
+Un classico esempio di implentazione del codice OTP \`e quello della creazione e gestione di canali di comunicazione.
 
+Possiamo scrivere il codice in configurazione Server/Callback.
+\subsubsection{Server}
+\begin{verbatim}
+-module(server).
+-export([start/1]).
+-export([call/2, cast/2]).
+-export([init/1]).
 
+start(Mod) ->
+spawn(server, init, [Mod]).
 
+call(Name, Req) ->
+Name ! {call, self(), Req},
+receive
+{Name, Res} ->
+Res
+end.
+
+cast(Name, Req) ->
+Name ! {cast, Req},
+ok.
+
+init(Mod) ->
+register(Mod, self()),
+State = Mod:init(),
+loop(Mod, State).
+
+loop(Mod, State) ->
+receive
+{call, From, Req} ->
+{Res, State2} = Mod:handle_call(Req, State),
+From ! {Mod, Res},
+loop(Mod, State2);
+{cast, Req} ->
+State2 = Mod:handle_cast(Req, State),
+loop(Mod, State2)
+end.
+\end{verbatim}
+
+\subsubsection{Modulo di callback (ch2)}
+\begin{verbatim}
+	-module(ch2).
+	-export([start/0]).
+	-export([alloc/0, free/1]).
+	-export([init/0, handle_call/2, handle_cast/2]).
+	
+	start() ->
+	server:start(ch2).
+	
+	alloc() ->
+	server:call(ch2, alloc).
+	
+	free(Ch) ->
+	server:cast(ch2, {free, Ch}).
+	
+	init() ->
+	channels().
+	
+	handle_call(alloc, Chs) ->
+	alloc(Chs). % => {Ch,Chs2}
+	
+	handle_cast({free, Ch}, Chs) ->
+	free(Ch, Chs). % => Chs2
+\end{verbatim}
+
+In questo esempio possiamo notare che:
+\begin{itemize}
+	\item Il codice server pu\`o essere riutilizzato per costruire molti server diversi.
+	\item Il nome del server, in questo esempio l'atomo \textbf{ch2}, \`e nascosto agli utenti delle funzioni client. Ci\`o significa che il nome pu\`o essere modificato senza che ci\`o influisca su di loro.
+	\item Anche il protocollo (messaggi inviati e ricevuti dal server) \`e nascosto. Questa \`e una buona pratica di programmazione e permette di modificare il protocollo senza dover modificare il codice, utilizzando le funzioni dell'interfaccia.
+	\item La funzionalit\`a server pu\`o essere estesa senza dover modificare \textbf{ch2} alcun altro modulo di callback.
+\end{itemize}
