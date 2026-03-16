@@ -47,7 +47,9 @@ const get = (url, params, headers) => request(url, params, "GET", headers);
 const post = (url, params, headers) => request(url, params, "POST", headers);
 
 \end{verbatim}
+
 per passare i parametri al gestore dei messaggi metteremo i valori in un array
+
 \begin{verbatim}
 const dati = 
 { 
@@ -334,7 +336,7 @@ La parte di funzione che si occupa di processare questo \`e il seguente:
 			Status = element(5, Result), % in_attesa | in_elaborazione | completata
 			NewStatus = case Status of
 				"in_attesa" -> 
-					% non è ancora stato elaborato il comando
+					% non e' ancora stato elaborato il comando
 					% cambiamo lo stato in in_elaborazione in modo che al prossimo passo
 					% venga inviato al server PHP
 					Result_elab = Result,
@@ -342,10 +344,11 @@ La parte di funzione che si occupa di processare questo \`e il seguente:
 				"in_elaborazione" -> 
 					% mi collego al server php per eseguire il comando
 					case ConnettiAlServerPHP(Result) of
-					{ok, Result_elab} -> binary_to_atom(<<"completata">>);
-					{busy, _} -> 
-					Result_elab = Result,
-					binary_to_atom(<<"in_elaborazione">>);
+						{ok, Result_elab} -> 
+							binary_to_atom(<<"completata">>);
+						{busy, _} -> 
+							Result_elab = Result,
+							binary_to_atom(<<"in_elaborazione">>);
 					end;
 				"completata" -> 
 					Result_elab = Result,
@@ -370,13 +373,110 @@ La parte di funzione che si occupa di processare questo \`e il seguente:
 Quando il client ci chiede se ci sono risposte alla sua richiesta, nel nostro caso \textbf{\textit{test\_message}}, andiamo a leggere lo stato corrispondente alla richiesta con identificativo \textit{\textbf{Id}}.
 
 Se lo status era \textit{in\_attesa} lo cambiamo con \textit{in\_elaborazione}.
-La volta successiva che il client ci far\`a la richiesta di conoscere il risultato della sua richiesta invieremo la richiesta al server PHP che, in caso riesca ad elaborare la richiesta la segner\`a come \textit{\textbf{completata}} nella tabella delle richieste.
+La volta successiva che il client ci far\`a la richiesta di conoscere il risultato dell'elaborazione invieremo il contenuto del messaggio al server PHP che, nel caso in cui riesca ad elaborarla la segner\`a come \textit{\textbf{completata}} nella tabella delle richieste.
 
-Il client, nella iterazione successiva, trovando che quel particolare Id \`e stato completato chieder\`a al gestore dei messaggi di cancellare quello con l'Id che non serve pi\`u. 
+Il client, nella iterazione successiva, trovando che quel particolare Id \`e stato completato chieder\`a al gestore dei messaggi di cancellarlo. 
 
 \subsubsection{Invio di dati da erlang al server PHP}
- Per spedire i dati al server
+ Per spedire i dati al server useremo, come visto, la funzione \textbf{\textit{send\_http\_request}} che, dato il json da inviare al server, ci restituir\`a il risultato dell'elaborazione o il fatto che il server \`e sovraccarico.
  
+ Per l'invio utilizzeremo le funzioni native di Erlang per la comunicazione e in particolare \textbf{\textit{httpc:request(}}.
+
+\begin{verbatim}
+	send_http_request(JsonBody) ->
+	% Ci assicuriamo che inets sia avviato
+	application:ensure_all_started(inets),
+	application:ensure_all_started(ssl),
+	
+	
+	% Content-Type deve essere application/json
+	ContentType = "application/json; charset=utf-8",
+	Url = "http://localhost/server.php",
+	
+	case httpc:request(post,
+	{Url, [], ContentType, JsonBody},
+	[{timeout, 5000}],
+	[]) of
+		{ok, {{_, StatusCode, _}, _Headers, ResponseBody}} ->
+			DecodedResponse = json:decode(iolist_to_binary(ResponseBody)),
+			JsonBodyReturn = #{
+				<<"Status">> => integer_to_binary(StatusCode),
+					<<"Risposta">> => DecodedResponse
+				},
+				% qui va controllato se il server era troppo occupato
+				{ok, JsonBodyReturn};
+			{error, Reason} ->
+				io:format("Errore: ~p", [Reason])
+	end
+	.		
+\end{verbatim} 
+
+\subsection{Comunicazione asincrona}
+Una soluzione migliore \`e quella di avere un modulo esterno in Erlang che venga inizializzato e che si occupi, in modo autonomo, di pescare dalla tabella mnesia e di fare la chiamata al server PHP mettendo il risultato, nel caso in cui la connessione vada a buon fine, dentro il database per poter essere recuperato dal client.
+
+Il problema di questa soluzione \`e che Yaws, in configurazione standard, avvia una propria VM Erlang che \`e diversa e isolata da quella installata sulla macchina virtuale.
+Per risolvere il problema dobbiamo collegare le due VM in modo che possano condividere anche le tabelle mnesia.
+Questo \`e possibile cambiando il file di configurazione di Yaws in modo che la macchina virtuale venga lanciata con il nome e con lo stesso cookie che useremo per la VM di Erlang in modo che possano condividere la stessa rete:
+
+Ad esempio:
+\begin{verbatim}
+# Avvio VM 1 (app che si collega con server PHP)
+erl -name app@localhost -setcookie mio_cookie_segreto
+
+# Avvio Yaws con lo stesso cookie
+yaws --erlarg "-name yaws@localhost -setcookie mio_cookie_segreto"
+\end{verbatim}
+
+ora che sono nella stessa rete le due VM vanno connesse:
+
+Dalla VM della app, ci connettiamo a Yaws e verifichiamo che siano connessi
+\begin{verbatim}
+1> net_kernel:connect_node('yaws@localhost').
+
+2> nodes().
+% -> ['yaws@localhost']
+
+\end{verbatim}
+
+e infine va collegato il database mnesia
+
+\begin{verbatim}
+% Dal nodo ESISTENTE (quello con il DB)
+mnesia:change_config(extra_db_nodes, ['nuovo@localhost']).
+\end{verbatim}
+
+Il problema di questa soluzione \`e che, per funzionare, Yaws deve essere configurato in modo che possa comunicare con altri worker di erlang.
+Questo pu\`o essere fatto in diversi modi:
+
+1. Script di avvio (modo pi\`u comune)
+\begin{verbatim}
+# /etc/yaws/yaws.start oppure in uno script
+yaws --erlarg "-name yaws@localhost -setcookie mio\_cookie"
+\end{verbatim}
+
+2. File yaws.conf - parametro erl\_flags
+
+\begin{verbatim}
+	conferl_flags = -name yaws@localhost -setcookie mio_cookie
+\end{verbatim}
+ 
+3. File /etc/yaws/yaws.conf - sezione globale
+\begin{verbatim}
+# Sezione globale in cima al file
+logdir = /var/log/yaws
+ebin_dir = /usr/lib/yaws/ebin
+
+# Parametri erlang
+erl_flags = -name yaws@localhost -setcookie mio_cookie
+\end{verbatim}
+
+4. Variabile d'ambiente
+\begin{verbatim}
+export ERL_FLAGS="-name yaws@localhost -setcookie mio_cookie"
+yaws --daemon
+\end{verbatim}
+
+I due server, dato che hanno in condivisione anche il server mnesia non hanno bisogno di comunicare tra di loro con la messaggistica integrata di Erlang.
  
 
 \section{Comunicazione tra gestore dei messaggi e server PHP}
