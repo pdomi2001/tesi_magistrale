@@ -103,7 +103,15 @@ record_to_map(R) ->
         <<"id">>        => element(2, R),
         <<"msg_type">>  => element(3, R),
         <<"payload">>   => element(4, R),
-        <<"stato">>     => atom_to_binary(element(5, R), utf8),
+        <<"stato">>     => 
+        		if
+					is_integer(element(5, R)) -> integer_to_binary(element(5, R));
+					is_binary(element(5, R))  -> element(5, R);
+					is_atom(element(5, R))    -> atom_to_binary(element(5, R), utf8);
+					true           -> <<"id_non_valido">>
+				end,
+
+			%atom_to_binary(element(5, R), utf8),
         <<"timestamp">> => list_to_binary(io_lib:format("~p", [element(6, R)]))
     }.
  

@@ -37,37 +37,6 @@ function HandlePost() {
     $msg_type = $payload['msg_type'] ?? 'sconosciuto';
 
 	SendJsonResponse(['result' => $payload, 'risposta' => GetRisposta($payload)]);
-        /*
-    switch ($msg_type) {
-        case 'test_messaggio':
-            SendJsonResponse([
-                'result'   => 'ok',
-                'msg_type' => $msg_type,
-                'data'     => $payload
-            ]);
-            break;
-
-        case 'registra_postazione':
-            $db = GetDbConnection();
-            try {
-                if (!SlotIsFree($db)) {
-                    SendJsonResponse(['result' => 'error', 'message' => 'Nessuno slot disponibile'], 503);
-                }
-                $mio_id = LockSlot($db);
-                SendJsonResponse(['result' => 'ok', 'id' => $mio_id]);
-            } finally {
-                CloseDbConnection($db);
-            }
-            break;
-
-        default:
-            SendJsonResponse([
-                'result'   => 'error',
-                'message'  => 'msg_type sconosciuto: ' . $msg_type
-            ], 400);
-            break;
-    }
-    */
 }
 
 try {

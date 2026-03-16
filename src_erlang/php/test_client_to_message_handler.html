@@ -107,7 +107,11 @@
 		var restart_timer = true;
 		post(server, dati).then((post_res) => {
 			document.getElementById("post_parametri").innerHTML = post_res.risposta.result_type;
-			document.getElementById("return_message").innerHTML = post_res.risposta.result_content.result_desc + " - " + post_res.risposta.result_content.id_message;
+			if (post_res.risposta == "process_data_error") {
+				document.getElementById("return_message").innerHTML = post_res.risposta;
+			} else {
+				document.getElementById("return_message").innerHTML = post_res.risposta.result_content.result_desc + " - " + post_res.risposta.result_content.id_message;
+			}
 			console.log("msg-arrived:" + post_res.risposta.result_type);
 			console.log("post_res :" + JSON.stringify(post_res.risposta.result_content));
 			if (post_res.risposta.result_type == "test_result_m") {
@@ -156,11 +160,11 @@
 		get(server).then((post) => {
 			document.getElementById("get").innerHTML = post.result;
 		});
-
+/*
 		get(server_php).then((post) => {
 			document.getElementById("get_php").innerHTML = post.result;
 		});
-
+*/
 	</script>
 </body>
 </html>

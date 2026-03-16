@@ -116,12 +116,38 @@
 				end,
 				case leggi_richiesta(IdNum) of
 					{ok, Result} ->
-						Status = element(5, Result),
-						Parametri_res = #{
+						Status = element(5, Result), % in_attesa | in_elaborazione | completata
+						NewStatus = case Status of
+							"in_attesa" -> 
+								% non è ancora stato elaborato il comando
+								% cambiamo lo stato in in_elaborazione in modo che al prossimo passo
+								% venga inviato al server PHP
+								Result_elab = Result,
+								binary_to_atom(<<"in_elaborazione">>);
+							"in_elaborazione" -> 
+								% mi collego al server php per eseguire il comando
+								case ConnettiAlServerPHP(Result) of
+									{ok, Result_elab} -> binary_to_atom(<<"completata">>);
+									{busy, _} -> 
+										Result_elab = Result,
+										binary_to_atom(<<"in_elaborazione">>);
+								end;
+							"completata" -> 
+								Result_elab = Result,
+								binary_to_atom(<<"in_elaborazione">>)
+						end,
+%						NewStatus = binary_to_atom(<<"in_elaborazione">>),
+						case aggiorna_stato(Id, NewStatus) of
+							{atomic, ok} ->
+								ok;
+							{aborted, Reason} ->
+								{error, Reason}
+						end,
+							Parametri_res = #{
 						<<"result_type">> => <<"test_result_r">>,
 						<<"result_content">> => #{
 								<<"result_desc">> => <<"reading_result">>,
-								<<"content">> => record_to_map(Result)
+								<<"content">> => record_to_map(Result_elab)
 								}
 						};
 					{error, not_found} ->
@@ -238,8 +264,43 @@
 			{content, "application/json", Risultato}
 		]
 		.   
+%
+%	Funzione che ci permette di mandare chiamate json al server php
+%
+%	Vuole il testo in json e torna il responso in forma di mappa erlang
+%		
+send_http_request(JsonBody) ->
+	% Ci assicuriamo che inets sia avviato
+	application:ensure_all_started(inets),
+	application:ensure_all_started(ssl),
 
-	% gestione del Database
+
+	% Content-Type deve essere application/json
+	ContentType = "application/json; charset=utf-8",
+	Url = "http://localhost/server.php",
+
+	case httpc:request(post,
+			{Url, [], ContentType, JsonBody},
+			[{timeout, 5000}],
+			[]) of
+		{ok, {{_, StatusCode, _}, _Headers, ResponseBody}} ->
+			DecodedResponse = json:decode(iolist_to_binary(ResponseBody)),
+			JsonBodyReturn = #{
+				<<"Status">> => integer_to_binary(StatusCode),
+				<<"Risposta">> => DecodedResponse
+			},
+			% qui va controllato se il server era troppo occupato
+			{ok, JsonBodyReturn};
+		{error, Reason} ->
+			io:format("Errore: ~p", [Reason])
+	end
+.		
+		
+%
+%
+% Funzioni per la gestione del Database mnesia
+%
+%
 	% Definizione del record
 	-record(richiesta, {
 		id,           % chiave univoca
