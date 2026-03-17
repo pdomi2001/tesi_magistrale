@@ -30,7 +30,6 @@ const request = (url, params = {}, method = "GET", customHeaders = {}) => {
         method,
         headers: {
             "Content-Type": "application/json", // Default per API moderne
-            ...customHeaders
         }
     };  if ("GET" === method) {
         url += "?" + new URLSearchParams(params).toString();
@@ -113,12 +112,12 @@ Alla funzione vengono passati una serie di parametri inviati dal client. Questi 
 
 I parametri che a noi interessano principalmente sono il metodo di connessioni (GET o POST) perch\'e i dati devono essere prelevati in modo differente, e le due variabili clidata per le chiamate in modalit\`a POST e querydata per le chiamate in modalit\`a GET.
 
-Nel codice sopra possiamo notare una sezione che restituisce degli header aggiuntivi rispetto alla richiesta. Questi header si rendono necessari perch\'e i browser, per evitare che ci possano essere attacchi di tipo XSS (Cross Site Scripting) impediscono collegamenti javascript che siano diretti al di fuori del proprio collegamento.
+Nel codice sopra possiamo notare una sezione che restituisce degli header aggiuntivi rispetto alla richiesta. Questi header si rendono necessari perch\'e i browser, per gestire le policy di accesso cross-origin (CORS), impediscono collegamenti javascript che siano diretti al di fuori del proprio collegamento.
 
-Nella nostra macchina di test, per poter eseguire contemporaneamente i server http PHP e YAWS abbiamo dovuto differenziare le porte per la connessione. Il server http PHP \`e stato impostato per lavorare sulla porta 80, mentre il server http yaws \`e stato impostato per lavorare sulla porta 8080.
+Nella nostra macchina di test, per poter eseguire contemporaneamente i server http PHP e Yaws abbiamo dovuto differenziare le porte per la connessione. Il server http PHP \`e stato impostato per lavorare sulla porta 80, mentre il server http Yaws \`e stato impostato per lavorare sulla porta 8080.
 Avendo messo il client sulla porta 80, per il browser qualsiasi collegamento, compresi quelli sulla stessa macchina ma su una porta diversa, vengono visti come collegamenti esterni.
 
-Per ovviare a questo problema \`e necessario che il server conceda, tramite un parametro dell'header la possibilit\`a di accesso da un sito esterno. Per far questo aggiungiamo alla risposta "Access-Control-Allow-Origin" impostando come sito autorizzato a collegarsi "*". Questo significa che tutti i siti esterni sono autorizzati ad accedere al server yaws.
+Per ovviare a questo problema \`e necessario che il server conceda, tramite un parametro dell'header la possibilit\`a di accesso da un sito esterno. Per far questo aggiungiamo alla risposta "Access-Control-Allow-Origin" impostando come sito autorizzato a collegarsi "*". In questo modo tutti i siti esterni sono autorizzati ad accedere al server Yaws.
 
 \subsection{Gestione delle diverse tipologie di connessione}
 La funzione \textit{processa\_comandi} si occupa di differenziare la gestione dei messaggi in base alla tipologia di connessione.
@@ -130,7 +129,7 @@ I primi due servono principalmente per verificare che la connessione funzioni, i
 
 Cercheremo di intercettare eventuali problemi con la gestione dei parametri tramite l'utilizzo delle clausole try ... catch.
 
-La struttura dei dati verr\`a infine convertita in json per essere inviata indietro dal server tramite la funzione \textit{json:encode()}. Utilizziamo la libreria \textit{json} invece di quella proposta nel libro  su Yaws (\textit{rfc4627}) perch\'e quest'ultima necessita di installazione ed \`e obsoleta. Fortunatamente, a partire dalla versione \textit{\textbf{Erlang/OTP 27}} \`e stato integrata direttamente nel linguaggio la libreria json che essendo nativa \`e anche pi\`u veloce e ottimizzata.
+La struttura dei dati verr\`a infine convertita in json per essere inviata indietro dal server tramite la funzione \textit{json:encode()}. Utilizziamo la libreria \textit{json} invece di quella proposta nel libro  su Yaws \cite{art:building_web_erlang} (\textit{rfc4627}) perch\'e quest'ultima necessita di installazione ed \`e obsoleta. Fortunatamente, a partire dalla versione \textit{\textbf{Erlang/OTP 27}} \`e stato integrata direttamente nel linguaggio la libreria \textit{json} che essendo nativa \`e anche pi\`u veloce e ottimizzata.
 
 \begin{verbatim}
 processa_comandi('POST', Arg) ->
@@ -174,7 +173,7 @@ Per memorizzare i messaggi in transito tra il client e il server, avvenendo la c
 
 Dato che i messaggi inviati dal client e quelli resituiti dal server hanno una struttura simile e che i codici dei messaggi non sono sovrapponibili useremo una sola tabella per la coda dei messaggi.
 
-I record della tabella avranno la seguente struttura:
+I record della tabella avranno la struttura in tabella \ref{tab:tabella_mnesia}:
 
 \begin{table}[h]
 	\centering % Centra la tabella nella pagina
@@ -311,7 +310,7 @@ L'invio delle richieste dal gestore dei messaggi al server PHP pu\`o avvenire in
 In alternativa la comunicazione potrebbe avvenire attraverso un agente Erlang esterno che processi in modo autonomo. Questa opzione \`e pi\`u complicata da impostare ma \`e in grado di fornire un grado di scalabilit\`a e affidabilit\`a maggiore.
 
 \subsection{Comunicazione sincrona}
-Nel nostro caso sfrutteremo il fatto di aver aggiunto, alla tabella del nostro database \textit{mnesia}, lo stato di elaborazione del messaggio. I tre stati che possiamo usare sono: in\_attesa, in elaborazione e completata.
+Nel nostro caso sfrutteremo il fatto di aver aggiunto, alla tabella del nostro database \textit{mnesia}, lo stato di elaborazione del messaggio. I tre stati che possiamo usare sono: \textit{in\_attesa}, \textit{in\_elaborazione} e \textit{completata}.
  
 Il messaggio, la prima volta che viene inserito nella tabella, avr\`a come valore \textit{\textbf{in\_attesa}} che sta ad indicare che il messaggio non \`e stato ancora processato.
 
@@ -515,7 +514,7 @@ ultimo_heartbeat TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 \end{verbatim}
 
-Creiamo quindi il codice per controllare se ci sono ancora slot disponibili:
+Proseguiamo creando il codice per controllare se ci sono ancora slot disponibili:
 
 \begin{verbatim}
 function GetMaxSlots() {
@@ -566,7 +565,7 @@ function UnLockSlot($db, $mio_id) {
 \subsection{Ricezione e gestione dei messaggi nel server PHP}
 La gestione dei messaggi in PHP avviene in modo analogo a quello che abbiamo implementato in Erlang con lo dovute differenze dovute al linguaggio di programmazione.
 
-La funzione principale, dopo che i dati \textit{json} sono stati estratti dal parametro POST \`e quella che , in base al tipo di messaggio ricevuto, esegue il codice necessario e torna indietro il risultato dell'elaborazione in modo che questo possa essere recuperato, al prossimo controllo, dal client javascript.
+La funzione principale, dopo che i dati \textit{json} sono stati estratti dal parametro POST \`e quella che, in base al tipo di messaggio ricevuto, esegue il codice necessario e torna indietro il risultato dell'elaborazione in modo che questo possa essere recuperato, al prossimo controllo, dal client javascript.
 
 \begin{verbatim}
 	function GetRisposta($payload) {

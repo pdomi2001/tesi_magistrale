@@ -41,7 +41,7 @@ Il gestore dei messaggi prender\`a uno dei messaggi dalla coda e si colleger\`a 
 
 Se la connessione va a buon fine il server PHP ci risponder\`a con il risultato della richiesta. Questa verr\`a nuovamente memorizzata nella coda dei messaggi come risposta pronta per essere inviata al client corrispondente all'ID della richiesta originale.
 
-Nel caso della comunicazione con il server avremo una comunicazione sincrona anzich\`e asincrona.
+Nel caso della comunicazione tra il gestore di messaggi e il server avremo una comunicazione sincrona anzich\`e asincrona.
 
 \begin{figure}[!hbtp]
 	\includegraphics[width=1.0\textwidth]{figure/Disegno 004_ Esempio comunicazione con gestore messaggi}
@@ -274,5 +274,5 @@ In questo esempio possiamo notare che:
 	\item Il codice server pu\`o essere riutilizzato per costruire molti server diversi.
 	\item Il nome del server, in questo esempio l'atomo \textbf{ch2}, \`e nascosto agli utenti delle funzioni client. Ci\`o significa che il nome pu\`o essere modificato senza che ci\`o influisca su di loro.
 	\item Anche il protocollo (messaggi inviati e ricevuti dal server) \`e nascosto. Questa \`e una buona pratica di programmazione e permette di modificare il protocollo senza dover modificare il codice, utilizzando le funzioni dell'interfaccia.
-	\item La funzionalit\`a server pu\`o essere estesa senza dover modificare \textbf{ch2} alcun altro modulo di callback.
+	\item La funzionalit\`a server pu\`o essere estesa senza dover modificare \textbf{ch2} o qualsiasi altro modulo di callback.
 \end{itemize}
