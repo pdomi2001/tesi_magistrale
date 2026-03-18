@@ -2,13 +2,13 @@
 Per l'implementazione del gestore di messaggi ci affideremo al web server implementato in Erlang \cite{web:erlang},  Yaws \cite{web:yaws}. 
 
 Yaws usa un sistema simile a quello di PHP.
-Permette infatti di includere codice erlang direttamente all'interno della pagina WEB inserendolo all'interno delle coppia di tag <erl> e </erl>.
+Permette infatti di includere codice Erlang direttamente all'interno della pagina WEB inserendolo all'interno delle coppia di tag <erl> e </erl>.
 
-La comunicazione tra client e server avviene tramite il passaggio di messaggi attraverso il gestore dei messaggi in erlang.
+La comunicazione tra client e server avviene tramite il passaggio di messaggi attraverso il gestore dei messaggi in Erlang.
 
 Questa si compone di due fasi distinte: la comunicazione tra il client e il gestore di messaggi e la comunicazione tra il gestore di messaggi e il server vero e proprio.
 
-Nella prima il client comunicher\`a con il gestore del messaggi attraverso semplici connessioni http o https in get o post che verranno processate dall'interprete erlang in Yaws.
+Nella prima il client comunicher\`a con il gestore del messaggi attraverso semplici connessioni HTTP o HTTPS in get o post che verranno processate dall'interprete Erlang in Yaws.
 
 Nella seconda fase il gestore di messaggi, comunicher\`a con web server PHP. Per evitare che si ripresenti lo stesso problema che avevamo con troppi client implementeremo una procedura che permetta solo un numero massimo di connessioni contemporanee. Sar\`a il gestore dei messaggi a permettere a tutti i client di collegarsi contemporaneamente e ad inviare i messaggi ricevuti al server al ritmo che il server accetta.
 
@@ -114,7 +114,7 @@ I parametri che a noi interessano principalmente sono il metodo di connessioni (
 
 Nel codice sopra possiamo notare una sezione che restituisce degli header aggiuntivi rispetto alla richiesta. Questi header si rendono necessari perch\'e i browser, per gestire le policy di accesso cross-origin (CORS), impediscono collegamenti javascript che siano diretti al di fuori del proprio collegamento.
 
-Nella nostra macchina di test, per poter eseguire contemporaneamente i server http PHP e Yaws abbiamo dovuto differenziare le porte per la connessione. Il server http PHP \`e stato impostato per lavorare sulla porta 80, mentre il server http Yaws \`e stato impostato per lavorare sulla porta 8080.
+Nella nostra macchina di test, per poter eseguire contemporaneamente i server HTTP PHP e Yaws abbiamo dovuto differenziare le porte per la connessione. Il server HTTP PHP \`e stato impostato per lavorare sulla porta 80, mentre il server HTTP Yaws \`e stato impostato per lavorare sulla porta 8080.
 Avendo messo il client sulla porta 80, per il browser qualsiasi collegamento, compresi quelli sulla stessa macchina ma su una porta diversa, vengono visti come collegamenti esterni.
 
 Per ovviare a questo problema \`e necessario che il server conceda, tramite un parametro dell'header la possibilit\`a di accesso da un sito esterno. Per far questo aggiungiamo alla risposta "Access-Control-Allow-Origin" impostando come sito autorizzato a collegarsi "*". In questo modo tutti i siti esterni sono autorizzati ad accedere al server Yaws.
@@ -169,7 +169,7 @@ processa_comandi('GET', _Arg) ->
 \end{verbatim}
 
 \subsection{Memorizzazione dei messaggi}
-Per memorizzare i messaggi in transito tra il client e il server, avvenendo la comunicazione in modo asincrono, ci avvarremo del database nativo erlang mnesia \cite{web:mnesia} che ci permetter\`a di memorizzare in modo efficace i vari comandi da inviare al server PHP ed anche le risposte di questo da inviare al client javascript.
+Per memorizzare i messaggi in transito tra il client e il server, avvenendo la comunicazione in modo asincrono, ci avvarremo del database nativo Erlang Mnesia \cite{web:mnesia} che ci permetter\`a di memorizzare in modo efficace i vari comandi da inviare al server PHP ed anche le risposte di questo da inviare al client javascript.
 
 Dato che i messaggi inviati dal client e quelli resituiti dal server hanno una struttura simile e che i codici dei messaggi non sono sovrapponibili useremo una sola tabella per la coda dei messaggi.
 
@@ -260,7 +260,7 @@ crea_tabelle() ->
 end.
 \end{verbatim}
 
-Nel codice erlang del server yaws mettiamo la gestione di scrittura e lettura dei vari messaggi:
+Nel codice Erlang del server Yaws mettiamo la gestione di scrittura e lettura dei vari messaggi:
 
 \begin{verbatim}
 	<<"test_message_m">> ->
@@ -376,7 +376,7 @@ La volta successiva che il client ci far\`a la richiesta di conoscere il risulta
 
 Il client, nella iterazione successiva, trovando che quel particolare Id \`e stato completato chieder\`a al gestore dei messaggi di cancellarlo. 
 
-\subsubsection{Invio di dati da erlang al server PHP}
+\subsubsection{Invio di dati da Erlang al server PHP}
  Per spedire i dati al server useremo, come visto, la funzione \textbf{\textit{send\_http\_request}} che, dato il json da inviare al server, ci restituir\`a il risultato dell'elaborazione o il fatto che il server \`e sovraccarico.
  
  Per l'invio utilizzeremo le funzioni native di Erlang per la comunicazione e in particolare \textbf{\textit{httpc:request(}}.
@@ -444,7 +444,7 @@ e infine va collegato il database mnesia
 mnesia:change_config(extra_db_nodes, ['nuovo@localhost']).
 \end{verbatim}
 
-Il problema di questa soluzione \`e che, per funzionare, Yaws deve essere configurato in modo che possa comunicare con altri worker di erlang.
+Il problema di questa soluzione \`e che, per funzionare, Yaws deve essere configurato in modo che possa comunicare con altri worker di Erlang.
 Questo pu\`o essere fatto in diversi modi:
 
 1. Script di avvio (modo pi\`u comune)
@@ -465,7 +465,7 @@ yaws --erlarg "-name yaws@localhost -setcookie mio\_cookie"
 logdir = /var/log/yaws
 ebin_dir = /usr/lib/yaws/ebin
 
-# Parametri erlang
+# Parametri Erlang
 erl_flags = -name yaws@localhost -setcookie mio_cookie
 \end{verbatim}
 

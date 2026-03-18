@@ -2,11 +2,11 @@
 
 Dopo aver effettuato le prove possiamo concludere che l'idea dell'utilizzo di un gestore di messaggi per rendere pi\`u efficente e robusto il server PHP \`e realizzabile.
 
-Durante la creazione del progetto sono emerse alcune criticit\`a e soluzioni alternative che potrebbero essere implementate sfuttando una buona parte del codice gi\`a scritto.
+Durante la creazione del progetto sono emerse alcune criticit\`a e soluzioni alternative che potrebbero essere implementate sfruttando una buona parte del codice gi\`a scritto.
 
-Una grossa criticit\`a di Yaws \`e che il codice erlang deve essere all'interno della stessa pagina ed \`e difficile, se non facendo operazioni particolari, usare dei moduli esterni personalizzati. Questo risulta in un codice molto lungo e poco leggibile e rende anche la manutenzione stessa dei moduli pi\`u difficoltosa.
+Una grossa criticit\`a di Yaws \`e che il codice Erlang deve essere all'interno della stessa pagina ed \`e difficile, se non facendo operazioni particolari, usare dei moduli esterni personalizzati. Questo risulta in un codice molto lungo e poco leggibile e rende anche la manutenzione stessa dei moduli pi\`u difficoltosa.
 
-Per quanto riguarda i miglioramenti, si potrebbe ad esempio, come citato nel capitolo 4.3.2, creare un collegamento tra la VM erlang di Yaws e altre esterne ad esso e, condividendo il database con macchine diverse da quella su cui gira il Web server Yaws, aumentarne la resilienza ed affidabilit\`a.
+Per quanto riguarda i miglioramenti, si potrebbe ad esempio, come citato nel capitolo 4.3.2, creare un collegamento tra la VM Erlang di Yaws e altre esterne ad esso e, condividendo il database con macchine diverse da quella su cui gira il Web server Yaws, aumentarne la resilienza ed affidabilit\`a.
 
 Un passo in avanti, utilizzando sempre il server Yaws, potrebbe essere quella di spostare tutta la parte di elaborazione dati e scrittura e lettura dei dati nella tabella mnesia, sul codice Erlang nativo e di usare il web server solo per l'accesso da parte dei client. Potremmo in questo caso sfruttare la messaggistica interna di Erlang per inviare le richieste ricevute dai client ai vari attori (worker). In questo modo riusciamo ad alleggerire il carico sul Single Point Of Failure che nel nostro caso \`e il Web Server Yaws.
 
@@ -14,7 +14,7 @@ Un ultimo miglioramento che si potrebbe fare \`e di riscrivere completamente la 
 
 Il fatto di avere tutto in Erlang nativo ci permette anche di superare la limitazione dettata da Yaws e dividere il nostro codice in diversi moduli rendendolo pi\`u leggibile e manutenibile.
 
-In conclusione, nonstante Erlang sia un linguaggio un po' ostico a causa della sua sintassi e del modo in cui alcune strutture della programmazione devono essere ripensate per poter essere implementate, la sua efficienza lo rende il linguaggio pi\`u adatto per progetti di questo tipo.
+In conclusione, nonostante Erlang sia un linguaggio un po' ostico a causa della sua sintassi e del modo in cui alcune strutture della programmazione devono essere ripensate per poter essere implementate, la sua efficienza lo rende il linguaggio pi\`u adatto per progetti di questo tipo.
 
 
 	
