@@ -34,7 +34,7 @@
 \contentsline {subsection}{\numberline {4.2.2}Memorizzazione dei messaggi}{22}{}%
 \contentsline {section}{\numberline {4.3}Invio dei messaggi da parte del gestore dei messaggi}{25}{}%
 \contentsline {subsection}{\numberline {4.3.1}Comunicazione sincrona}{25}{}%
-\contentsline {subsubsection}{Invio di dati da erlang al server PHP}{27}{}%
+\contentsline {subsubsection}{Invio di dati da Erlang al server PHP}{27}{}%
 \contentsline {subsection}{\numberline {4.3.2}Comunicazione asincrona}{28}{}%
 \contentsline {section}{\numberline {4.4}Comunicazione tra gestore dei messaggi e server PHP}{29}{}%
 \contentsline {subsection}{\numberline {4.4.1}Limitazione del numero di connessioni al server PHP}{29}{}%

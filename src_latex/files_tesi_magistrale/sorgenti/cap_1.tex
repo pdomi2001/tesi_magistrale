@@ -7,7 +7,7 @@ Nello specifico se sia possibile migliorare e rendere pi\`u robusto ed affidabil
 
 I problemi principali che ci proponiamo di risolvere sono l'affidabilit\`a nel trasferimento dei dati a causa di problemi di connettivit\`a e la garanzia di congruenza dei dati stessi.
 
-Per fare questo si vuole creare una rete di nodi (da stabilire) che permettano alle postazioni studente di inviare sia le versioni temporanee che quelle definitive delle risposte al test, ai server che raccolgono i risultati e realizzare anche, sempre tramite la rete di nodi erlang una rete affidabile e resistente ai problemi.
+Per fare questo si vuole creare una rete di nodi (da stabilire) che permettano alle postazioni studente di inviare sia le versioni temporanee che quelle definitive delle risposte al test, ai server che raccolgono i risultati e realizzare anche, sempre tramite la rete di nodi Erlang una rete affidabile e resistente ai problemi.
 
 \section{Introduzione al problema}
 Al momento la somministrazione dei test al PC utilizzando i browser web utilizzano una architettura di tipo Client/Server per gestire la comunicazione tra il server che gestisce e distribuisce il test e i vari client che registrano ed inviano le risposte inserite dagli studenti.
@@ -24,7 +24,7 @@ In linea di massima lo schema \`e quello visibile in figura \ref{fig:configurazi
 In questa modalit\`a ogni client fa una serie di chiamate al server web che genera dinamicamente la pagina da visualizzare sul browser del client.
 Questa pagina viene generata diversamente in base allo stato in cui si trova il client. Ad esempio potrebbe essere la pagina per fare il login alla piattaforma oppure quella in cui si inseriscono i propri dati passando per le pagine in cui ci sono le domande del test con i campi in cui l'utente inserisce la risposta esatta fino ad arrivare alla pagina con il punteggio realizzato del test.
 
-Tutte queste interazioni avvengono, attraverso chiamate http o https e sfruttano direttamente le risorse della macchina su cui \`e installato il web server.
+Tutte queste interazioni avvengono, attraverso chiamate HTTP o HTTPS e sfruttano direttamente le risorse della macchina su cui \`e installato il web server.
 
 All'aumentare del numero di utenti che si collegano aumenta anche la quantit\`a di risorse che vengono utilizzate fino ad arrivare ad un punto, dipendente dall'architettura e dalle risorse presenti sulla macchina, che impedisce al web server di funzionare correttamente provocando una serie di errori.
 
@@ -32,7 +32,7 @@ All'aumentare del numero di utenti che si collegano aumenta anche la quantit\`a 
 \section{Possibili soluzioni}
 
 \subsection{Aumento delle risorse}
-La prima soluzione e quella pi\`u comune \`e quella di aumentare le risorse disponibili per il Web server.
+La prima soluzione, e quella pi\`u comune, \`e quella di aumentare le risorse disponibili per il Web server.
 
 Questo si pu\`o fare acquistando nuovo hardware e installando sulla nuova macchina un nuovo web server che per\`o va configurato ed ottimizzato correttamente e richiede un investimento periodico, oltre che economico per l'acquisto dell'hardware, anche di tempo per l'installazione, la configurazione e il trasferimento dei dati tra una macchina e l'altra.
 
@@ -50,7 +50,7 @@ D'altro canto l'investimento economico in questi ultimi due casi \`e necessariam
 \subsection{Un nuovo approccio}
 Il lavoro che verr\`a portato avanti in questa tesi si pone come obiettivo quello di trovare un sistema per evitare il problema del sovraccarico del server web da parte di troppe connessioni contemporanee senza dover investire in nuove risorse hardware.
 
-Per far questo creeremo in layer intermedio tra il web server e i client come in Figura \ref{fig:nuova_configurazione}.
+Per far questo creeremo un layer intermedio tra il web server e i client come in Figura \ref{fig:nuova_configurazione}.
 
 \begin{figure}[!hbtp]
     \centering
