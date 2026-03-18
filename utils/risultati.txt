@@ -1,0 +1,70 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83  57433  17988 --:--:-- --:--:-- --:--:-- 87000
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83   114k  36644 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83   111k  35853 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83  93277  29215 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83  88539  27731 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83  99661  31214 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83   111k  35760 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83  72782  22795 --:--:-- --:--:-- --:--:--  113k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   348  100   265  100    83   104k  33400 --:--:-- --:--:-- --:--:--  169k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   350  100   266  100    84   110k  35683 --:--:-- --:--:-- --:--:--  170k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  86753  21238 --:--:-- --:--:-- --:--:--  146k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  94807  23210 --:--:-- --:--:-- --:--:--  146k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  80333  19666 --:--:-- --:--:-- --:--:--  146k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  40039   9802 --:--:-- --:--:-- --:--:-- 60000
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59   103k  26048 --:--:-- --:--:-- --:--:--  146k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  33430   8184 --:--:-- --:--:-- --:--:-- 42857
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  39828   9750 --:--:-- --:--:-- --:--:-- 60000
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  66154  16195 --:--:-- --:--:-- --:--:--   97k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  35085   8589 --:--:-- --:--:-- --:--:-- 50000
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   300  100   241  100    59  50124  12271 --:--:-- --:--:-- --:--:-- 75000
+{"method":"POST","result":{"msg_content":{"id":122274},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122274","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122306},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122306","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122338},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122338","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122370},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122370","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122402},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122402","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122434},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122434","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122466},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122466","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122498},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122498","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122530},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122530","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
+{"method":"POST","result":{"msg_content":{"id":122562},"msg_type":"test_message_s"},"risposta":{"result_content":{"id_message":"122562","result_desc":"result successful "},"result_type":"test_result_s"},"title":"Arrivato messaggio in POST"}
