@@ -8,7 +8,7 @@ NUMERO_THREAD=50
 # Azzero il file con l'elenco dei messaggi da controllare
 > elenco_id_messaggi.txt
 
-seq $1 | parallel -j $NUMERO_THREAD --bar --joblog send_log.log ./send_message_client.sh 2>> errori_send.txt >>output_send.txt
+seq $NUMERO_TEST | parallel -j $NUMERO_THREAD --bar --joblog send_log.log ./send_message_client.sh 2>> errori_send.txt >>output_send.txt
 
 # ora simulo le interrogazioni dei client per vedere se il messaggio è stato processato
 

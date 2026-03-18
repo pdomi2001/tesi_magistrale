@@ -28,5 +28,138 @@ Successivamente possiamo verificare anche la richiesta fatta in modalit\`a POST 
 \subsection{Verifica connessione con gestore messaggi}
 
 
-%\subsection{Stress test}
+\section{Stress test}
 
+\subsection{Creazione dei file per i test}Per verificare che il nostro sistema sia affidabile creeremo un test che simuli la presenza di molti client contemporaneamente.
+
+Ci avvarremmo di tre utility presenti sulla nostra macchina Debian:
+\begin{itemize}
+	\item curl
+	\item parallel
+	\item jq
+\end{itemize}
+
+Useremo \textbf{\textit{curl}} per le comunicazioni con il server, \textbf{\textit{parallel}} per eseguire pi\`u processi contemporaneamente in modo da simulare la connessione contemporanea da parte di pi\`u client e \textbf{\textit{jq}} per estrarre, dalla prima richiesta, l'id del messaggio che \`e stato inserito nella coda.
+
+Creiamo come prima cosa il file \textit{\textbf{send\_message\_client.sh}} che invia il primo messaggio al server Yaws. Le operazioni che questo file esegue sono:
+\begin{itemize}
+\item Si collega al server con \textit{curl} e invia i dati \textit{json} in POST utilizzando l'ID che \`e stato passato al file come parametro per il numero di iterazioni. 
+\item Mette il risultato della chiamata in una variabile per poterlo elaborare successivamente.
+\item Usando l'utility \textit{jq} estre, dal json contenuto nella varibile, il valore dell'id del messaggio.
+\item Aggiunge l'id estratto all'elenco degli id che sono stati memorizzati per poterlo usare nella seconda fase.
+\end{itemize}
+
+Il codice \`e il seguente:
+\begin{verbatim}
+#!/usr/bin/bash
+ID_CHIAMATA=$1
+
+# Supponiamo che la risposta arrivi da una chiamata curl
+RISPOSTA_JSON=$(curl -X POST -d "{\"msg_type\":\"test_message_m\", 
+			\"msg_content\": {\"numero_iterazioni\":$ID_CHIAMATA,\"test\":\"Sara\"}}" 
+			http://localhost:8080/server.yaws)
+
+# Estraiamo l'id_message usando jq
+ID_ESTRATTO=$(echo "$RISPOSTA_JSON" | jq -r '.risposta.result_content.id_message')
+
+# Assegniamo il primo argomento a una variabile con un nome chiaro
+echo $ID_ESTRATTO >> elenco_id_messaggi.txt
+
+#sleep 20
+\end{verbatim}
+
+Passiamo quindi a creare il file \textit{\textbf{test\_result\_client.sh}} che invia il messaggio per sapere l'esito dell'elaborazione al server Yaws. Le operazioni che questo file esegue sono:
+\begin{itemize}
+\item Mette il parametro passato sulla linea di comando nella varibile ID\_RICHIESTA.
+\item Invia, tramite \textit{curl} il json per conoscere lo stato della richiesta mettendo come parametro per l'ID della richiesta da controllare quello appena memorizzato.
+\end{itemize}
+
+Il codice \`e il seguente:
+\begin{verbatim}
+#!/usr/bin/bash
+
+# Assegniamo il primo argomento a una variabile con un nome chiaro
+ID_RICHIESTA=$1
+
+curl -X POST -d "{\"msg_type\":\"test_message_s\", \"msg_content\": 
+			{\"id\":$ID_RICHIESTA}}" http://localhost:8080/server.yaws
+
+\end{verbatim}
+
+Andiamo ora a mettere insieme le richieste e ad automatizzarle. 
+Creiamo il file \textbf{\textit{stress\_test\_1.sh}} che si occuper\`a di inviare una serie di richieste al web server e di simulare anche una prima richiesta di controllo sullo stato di elaborazione della richiesta.
+
+Le operazioni che dovr\`a fare sono:
+\begin{itemize}
+	\item Memorizzare in una variabile il numero di richieste da generare
+	\item Cancellare l'elenco presente degli id di messaggi da controllare.
+	\item Eseguire in parallelo, usando un numero di thread definito, le richieste di invio chiamando il file \textit{send\_message\_client.sh} che abbiamo visto prima.
+	
+	L'esecuzione di questo comando creer\`a, nel file \textit{elenco\_id\_messaggi.txt}, un elenco degli id con cui i messaggi sono stati memorizzati nel database mnesia.
+	\item Utilizzando il contenuto dell'elenco appena creato da passare alle singole chiamate al file \textit{test\_result\_client.sh} procediamo come sopra a parallelizzare le chiamate che controllano lo stato di elaborazione del messaggio. 
+\end{itemize}
+
+Il codice \`e il seguente:
+
+\begin{verbatim}
+#!/usr/bin/bash
+
+# Assegniamo il primo argomento a una variabile con un nome chiaro
+NUMERO_TEST=$1
+# Numero di thread contemporanei
+NUMERO_THREAD=50
+
+# Azzero il file con l'elenco dei messaggi da controllare
+> elenco_id_messaggi.txt
+
+seq $NUMERO_TEST | parallel -j $NUMERO_THREAD --bar --joblog send_log.log
+		./send_message_client.sh 2>> errori_send.txt >>output_send.txt
+
+# ora simulo le interrogazioni dei client per vedere se il messaggio 
+		e' stato processato
+
+cat elenco_id_messaggi.txt | parallel -j $NUMERO_THREAD --bar --joblog 
+		receive_log.log ./test_result_client.sh  2>> errori_receive.txt 
+		>>output_receive.txt
+
+\end{verbatim}
+
+Per poter fare delle valutazioni andremo a misurare il tempo di esecuzione dell'intera procedura. Creiamo quindi il file stress\_test.sh che, usando la funzione time, misurer\`a il tempo di esecuzione della procedura memorizzandolo in un file di testo chiamato con il numero di iterazioni che stiamo eseguendo.
+
+Il codice \`e il seguente:
+
+\begin{verbatim}
+#!/usr/bin/bash
+
+# Assegniamo il primo argomento a una variabile con un nome chiaro
+NUMERO_TESTS=$1
+
+/usr/bin/time -p --output=$NUMERO_TESTS.txt ./stress_test_1.sh $NUMERO_TESTS
+
+\end{verbatim}
+
+\subsection{Esecuzione del test}
+Eseguiremo il test a step successivi per verificare la tenuta del server web Yaws. Partiremo da 150 richieste fino ad arrivare a 5000.
+
+Il risultato delle prove \`e quello visibile in Figura \ref{fig:stress_test}.
+
+\begin{figure}[!hbtp]
+	\fbox{\includegraphics[width=1.0\textwidth]{figure/stress_test.png}
+	}
+	\caption{Risultati dello stress test}
+	\label{fig:stress_test}
+\end{figure}
+
+\subsubsection{Considerazioni}
+Il web server Yaws riesce a gestire tranquillamente tutte le richieste che gli sono state inviate e, come si pu\`o notare dal grafico, il tempo richiesto dal test sale in modo lineare indipendentemente dal numero di richieste che stiamo facendo.
+
+Posto che, per essere pi\`u veritiero, il test andrebbe eseguito da una macchina esterna in modo che l'esecuzione delle richieste non utilizzi la CPU assieme al server Yaws, possiamo comunque essere soddisfatti del risultato.
+
+\subsubsection{Confronto con un caso reale}
+Volendo fare un confronto  con un caso reale, la piattaforma che ho realizzato per svolgere i test del Campionato Nazionale delle Lingue\cite{web:cndl}, che \`e stato realizzato utilizzando la struttura classica con il server web PHP che genera l'intera pagina da mandare al client, inizia a dare problemi quando ci sono oltre 300 test in corso contemporaneamente. 
+
+Questa piattaforma, \`e stata studiata per essere il pi\`u leggera possibile limitando il pi\`u possibile il numero di interazioni tra i client e il server. Questi si collegano solo quando il client deve cambiare la pagina da visualizzare come ad esempio per richiedere il test o quando si cambia la pagina del test. In questo modo, durante l'esecuzione del test da parte dello studente il server non viene coinvolto quasi mai e tutto il tempo che lo studente passa su una singola pagina del test non genera traffico. Considerando delle pagine medie le interazioni saranno all'incirca ogni 3 minuti. Le probabilit\`a che in questo lasso di tempo pi\`u client facciano richiesta di connessione al server contemporaneamente sono basse e dovrebbero abbassare il carico medio risultante sul server.
+
+Nonostante tutte le precauzioni prese in fase di progettazione, come si diceva sopra, quando i test superano i 300 iniziano a presentarsi problemi di sovraccarico.
+
+Nel nostro caso, nonostante la macchina di test fosse una macchina virtuale con soli 2GB di ram e 1 solo processore, ha gestito tranquillamente 5000 messaggi e, per come \`e strutturata, potrebbe sicuramente gestirne un numero pi\`u elevato.
