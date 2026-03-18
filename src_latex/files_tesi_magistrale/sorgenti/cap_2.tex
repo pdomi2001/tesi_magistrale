@@ -41,7 +41,7 @@ Il gestore dei messaggi prender\`a uno dei messaggi dalla coda e si colleger\`a 
 
 Se la connessione va a buon fine il server PHP ci risponder\`a con il risultato della richiesta. Questa verr\`a nuovamente memorizzata nella coda dei messaggi come risposta pronta per essere inviata al client corrispondente all'ID della richiesta originale.
 
-Nel caso della comunicazione con il server avremo una comunicazione sincrona anzich\`e asincrona.
+Nel caso della comunicazione tra il gestore di messaggi e il server avremo una comunicazione sincrona anzich\`e asincrona.
 
 \begin{figure}[!hbtp]
 	\includegraphics[width=1.0\textwidth]{figure/Disegno 004_ Esempio comunicazione con gestore messaggi}
@@ -137,6 +137,61 @@ end
 
 a seconda del \textit{pattern} ricevuto verr\`a eseguita l'azione corrispondente. 
 
+Possiamo vedere un tipi scambio di messaggio tra attori di Erlang in figura \ref{fig:erlang-comunicazione-ad-attori}
+
+\begin{figure}[!hbtp]
+	\includegraphics[width=1.0\textwidth]{figure/comunicazione_ad_attori.png}
+	\caption{Comunicazione ad attori}
+	\label{fig:erlang-comunicazione-ad-attori}
+\end{figure}
+
+In questo esempio \textit{Attore 1} invia un messaggio ad \textit{Attore 3} che a sua volta invia messaggi ad \textit{Attore 1}, \textit{Attore 2} e \textit{Attore 4}. Infine \textit{Attore 4} invia un messaggio ad \textit{Attore 2}
+
+Un esempio classico per dimostrare il funzionamento pratico della comunicazione tra attori \`e il ping pong, il rimpallo di messaggi tra due attori.
+
+\begin{verbatim}
+-module(ping_pong).
+-export([start/0, ping/2, pong/0]).
+
+start() ->
+	PongPid = spawn(fun pong/0),
+	spawn(fun() -> ping(3, PongPid) end).
+
+% Processo PING - invia ping e aspetta pong
+ping(0, PongPid) ->
+	PongPid ! stop,
+	io:format("Ping: ho finito!~n");
+
+ping(N, PongPid) ->
+	PongPid ! {ping, self()},
+	receive
+		pong ->
+			io:format("Ping: ricevuto pong~n"),
+			ping(N - 1, PongPid)
+	end.
+
+% Processo PONG - aspetta ping e risponde pong
+pong() ->
+	receive
+		{ping, PingPid} ->
+			io:format("Pong: ricevuto ping~n"),
+			PingPid ! pong,
+			pong();
+		stop ->
+			io:format("Pong: fermato~n")
+	end.
+\end{verbatim}
+
+Nella funzione start() vengono creati due processi che girano in parallelo. Uno per il Ping e uno per il Pong che chiameremo PingPid e PongPid.
+Mentre il processo PongPid rimane in attesa di messaggi il processo PingPid viene creato chiamando direttamente la funzione ping() a cui viene passato il Pid dell'altro processo.
+
+La funzione ping di PingPid manda un messaggio a PongPid che come contenuto ha {ping, self()}. La funzione self() restituisce il Pid dell'attore che sta eseguendo la funzione per cui a PongPid arriva un messaggio del tipo {ping, Pid} che viene intercettato dalla prima clausola della receive nella funzione pong().
+
+PongPid manda a sua volta al processo che l'ha chiamato, che in questo caso \`e PingPid il messaggio pong.
+
+Questa modalit\`a, che a prima vista potrebbe sembrare complicata \`e estremamente semplice e, cosa pi\`u importante, \`e trasparente rispetto a dove si trovano i processi. Questi possono essere sulla stessa VM Erlang, su VM Erlang diverse sulla stessa macchina o su VM che si trovano su macchine che sono ubicate in paesi diversi.
+
+
 \subsection{Hot Code Swapping}
 Un'altra caratteristica interessante di erlang rispetto ad altri linguaggi \`e la sua capacit\`a di aggiornare il codice di una applicazione mentre questa \`e in esecuzione (\textit{Hot Code Swapping}), senza interrompere il servizio. I nuovi processi utilizzeranno il nuovo codice, mentre quelli vecchi continueranno con la versione precedente finch\`e non terminano o vengono aggiornati.
 
@@ -219,5 +274,5 @@ In questo esempio possiamo notare che:
 	\item Il codice server pu\`o essere riutilizzato per costruire molti server diversi.
 	\item Il nome del server, in questo esempio l'atomo \textbf{ch2}, \`e nascosto agli utenti delle funzioni client. Ci\`o significa che il nome pu\`o essere modificato senza che ci\`o influisca su di loro.
 	\item Anche il protocollo (messaggi inviati e ricevuti dal server) \`e nascosto. Questa \`e una buona pratica di programmazione e permette di modificare il protocollo senza dover modificare il codice, utilizzando le funzioni dell'interfaccia.
-	\item La funzionalit\`a server pu\`o essere estesa senza dover modificare \textbf{ch2} alcun altro modulo di callback.
+	\item La funzionalit\`a server pu\`o essere estesa senza dover modificare \textbf{ch2} o qualsiasi altro modulo di callback.
 \end{itemize}

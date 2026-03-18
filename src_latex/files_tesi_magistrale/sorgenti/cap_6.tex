@@ -2,13 +2,13 @@
 
 Dopo aver effettuato le prove possiamo concludere che l'idea dell'utilizzo di un gestore di messaggi per rendere pi\`u efficente e robusto il server PHP \`e realizzabile.
 
-Durante la creazione del progetto sono emerse alcune criticit\`a e soluzioni alternative che potrebbero essere implementate sfuttando una buona del codice gi\`a scritto.
+Durante la creazione del progetto sono emerse alcune criticit\`a e soluzioni alternative che potrebbero essere implementate sfuttando una buona parte del codice gi\`a scritto.
 
-Una grossa criticit\`a di Yaws \`e che il codice erlang deve essere all'interno della stessa pagina ed \`e difficile, se non facendo operazioni particolari, usare dei moduli estrerni personalizzati. Questo risulta in un codice molto lungo e poco leggibile e rende anche la manutenzione stessa dei moduli pi\`u difficoltosa.
+Una grossa criticit\`a di Yaws \`e che il codice erlang deve essere all'interno della stessa pagina ed \`e difficile, se non facendo operazioni particolari, usare dei moduli esterni personalizzati. Questo risulta in un codice molto lungo e poco leggibile e rende anche la manutenzione stessa dei moduli pi\`u difficoltosa.
 
 Per quanto riguarda i miglioramenti, si potrebbe ad esempio, come citato nel capitolo 4.3.2, creare un collegamento tra la VM erlang di Yaws e altre esterne ad esso e, condividendo il database con macchine diverse da quella su cui gira il Web server Yaws, aumentarne la resilienza ed affidabilit\`a.
 
-Un passo in avanti, utilizzando sempre il server Yaws, potrebbe essere quella di spostare tutta la parte di elaborazione dati e scrittura e lettura dei dati nella tabella mnesia, sul codice Erlang nativo e di usare il web server solo per l'accesso da parte dei client. Potremmo in questo caso sfruttare la messaggistica interna di Erlang per inviare le richieste ricevute dai client ai vari attori (worker). In questo modo riusciamo ad alleggerire il carico sul Single Point Of Failure nel nostro caso il WEb Server Yaws.
+Un passo in avanti, utilizzando sempre il server Yaws, potrebbe essere quella di spostare tutta la parte di elaborazione dati e scrittura e lettura dei dati nella tabella mnesia, sul codice Erlang nativo e di usare il web server solo per l'accesso da parte dei client. Potremmo in questo caso sfruttare la messaggistica interna di Erlang per inviare le richieste ricevute dai client ai vari attori (worker). In questo modo riusciamo ad alleggerire il carico sul Single Point Of Failure che nel nostro caso \`e il Web Server Yaws.
 
 Un ultimo miglioramento che si potrebbe fare \`e di riscrivere completamente la parte di gestione delle chiamate web direttamente nel nostro codice senza utilizzare il server Yaws. In questo caso il vantaggio sarebbe che non \`e necessario modificare la configurazione del web server per renderlo parte della rete Erlang. Anche in questo caso, buona parte del codice che abbiamo gi\`a scritto potrebbe essere riutilizzato.
 

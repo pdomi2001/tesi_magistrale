@@ -67,7 +67,7 @@ Allo stesso modo dobbiamo codificare i messaggi di risposta dei server nel caso 
 	\label{tab:tabella_comandi}
 \end{table}
 
-Nel caso in cui usiamo il gestore di messaggi, la comunicazione sar\`a asincrona per cui, una volta inviato il messaggio da parte del client, nella risposta ci sar\`a l'id della richiesta e, ad intervalli regolari, il client potr\`a verificare se la richiesta \`e andata a buon fine come indicato nella figura \ref{fig:Esempio_comunicazione_con_gestore_messaggi}.
+Se usiamo il gestore di messaggi, la comunicazione sar\`a asincrona per cui, una volta inviato il messaggio da parte del client, nella risposta ci sar\`a l'id della richiesta e, ad intervalli regolari, il client potr\`a verificare se la richiesta \`e andata a buon fine come indicato nella figura \ref{fig:Esempio_comunicazione_con_gestore_messaggi}.
 
 \section{Struttura Record in Erlang}
 In erlang avremo diverse strutture interne che saranno poi convertire in JSON. Quanto utilizziamo la libreria \textit{json} il testo json viene convertito in una mappa e viceversa.
