@@ -46,12 +46,12 @@
 \contentsline {subsection}{\numberline {5.1.2}Verifica connessione con gestore messaggi}{34}{}%
 \contentsline {section}{\numberline {5.2}Stress test}{34}{}%
 \contentsline {subsection}{\numberline {5.2.1}Creazione dei file per i test}{34}{}%
-\contentsline {subsection}{\numberline {5.2.2}Esecuzione del test}{37}{}%
-\contentsline {subsubsection}{Considerazioni}{37}{}%
-\contentsline {subsubsection}{Confronto con un caso reale}{37}{}%
-\contentsline {chapter}{\numberline {6}Conclusioni}{39}{}%
-\contentsline {chapter}{\numberline {A}Appendice A}{40}{}%
-\contentsline {section}{\numberline {A.1}Client javascript per Verifica connessione di base}{40}{}%
-\contentsline {section}{\numberline {A.2}Client javascript per Verifica comunicazioni tra client e gestore dei messaggi}{42}{}%
-\contentsline {chapter}{Bibliografia}{43}{}%
-\contentsline {chapter}{Ringraziamenti}{44}{}%
+\contentsline {subsection}{\numberline {5.2.2}Esecuzione del test}{38}{}%
+\contentsline {subsubsection}{Considerazioni}{40}{}%
+\contentsline {subsubsection}{Confronto con un caso reale}{40}{}%
+\contentsline {chapter}{\numberline {6}Conclusioni}{41}{}%
+\contentsline {chapter}{\numberline {A}Appendice A}{42}{}%
+\contentsline {section}{\numberline {A.1}Client javascript per Verifica connessione di base}{42}{}%
+\contentsline {section}{\numberline {A.2}Client javascript per Verifica comunicazioni tra client e gestore dei messaggi}{44}{}%
+\contentsline {chapter}{Bibliografia}{49}{}%
+\contentsline {chapter}{Ringraziamenti}{50}{}%

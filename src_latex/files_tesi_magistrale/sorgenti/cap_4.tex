@@ -524,7 +524,8 @@ function GetMaxSlots() {
 function SlotIsFree($db) {
   // Pulizia automatica (probabilita' 5% per ogni chiamata)
   if (rand(1, 100) <= 5) {
-    // Elimina i record piu' vecchi di 1 minuto (processi probabilmente crashati)
+    // Elimina i record piu' vecchi di 1 minuto 
+    // (processi probabilmente crashati)
     $db->query("DELETE FROM processi_attivi
      WHERE data_inizio < NOW() - INTERVAL 1 MINUTE");
   }
@@ -544,10 +545,12 @@ Aggiungiamo quindi il codice per prenotare e sbloccare uno slot di esecuzione:
 
 \begin{verbatim}
 function LockSlot($db) {
-  $token = bin2hex(random_bytes(16)); // Generiamo un ID unico per questa esecuzione
+  // Generiamo un ID unico per questa esecuzione
+  $token = bin2hex(random_bytes(16)); 
 
   // 1. Inseriamo il record per tentare di occupare uno slot
-  $stmt = $db->prepare("INSERT INTO processi_attivi (token_univoco) VALUES (?)");
+  $stmt = $db->prepare(
+  	"INSERT INTO processi_attivi (token_univoco) VALUES (?)");
   $stmt->execute([$token]);
   $mio_id = $db->lastInsertId();
   
@@ -556,7 +559,8 @@ function LockSlot($db) {
 
 function UnLockSlot($db, $mio_id) {
   if (isset($mio_id)) {
-    $db->prepare("DELETE FROM processi_attivi WHERE id = ?")->execute([$mio_id]);
+    $db->prepare(
+    	"DELETE FROM processi_attivi WHERE id = ?")->execute([$mio_id]);
   }
 }   
 
@@ -573,19 +577,22 @@ La funzione principale, dopo che i dati \textit{json} sono stati estratti dal pa
 			case "test_message":
 				$result = [
 					"result_type" => "test_result",
-					"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+					"result_content" => 
+						"result successful ".$payload["msg_content"]["numero_iterazioni"]
 				];
 			break;
 			case "test_message_m":
 				$result = [
 					"result_type" => "test_result_r",
-					"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+					"result_content" => 
+						"result successful ".$payload["msg_content"]["numero_iterazioni"]
 				];
 			break;
 			case "registra_postazione":
 				$result = [
 					"result_type" => "registra_posizione_result",
-					"result_content" => "result successful ".$payload["msg_content"]["numero_iterazioni"]
+					"result_content" => 
+						"result successful ".$payload["msg_content"]["numero_iterazioni"]
 				];
 				break;
 			default:

@@ -6,7 +6,7 @@ Per verificare il funzionamento delle varie parti abbiamo realizzato diversi fil
 \subsection{Verifica connessione di base}
 Come prima cosa verifichiamo se funziona la connessione di base.
 
-Per far questo useremo il client javascript presente in appendice \ref*{javascript_verifica_base_src} che, appena viene aperta la pagina, fa i due test in get visualizzando il risultato tornato, da una chiamata in GET dal server Yaws e dal server PHP (\ref{fig:test_comunicazione_base_GET}).
+Per far questo useremo il client javascript presente in appendice \ref*{javascript_verifica_base_src} che, appena viene aperta la pagina, fa i due test in GET visualizzando il risultato tornato, da una chiamata in GET dal server Yaws e dal server PHP (Figura \ref{fig:test_comunicazione_base_GET}).
 
 \begin{figure}[!hbtp]
 	\fbox{\includegraphics[width=1.0\textwidth]{figure/test_connessione_GET.png}
@@ -26,6 +26,36 @@ Successivamente possiamo verificare anche la richiesta fatta in modalit\`a POST 
 
 
 \subsection{Verifica connessione con gestore messaggi}
+Come seconda prova verifichiamo se funziona correttamente la comunicazione con il server Yaws.
+
+Per far questo useremo il client javascript presente in appendice \ref*{javascript_verifica_comunicazione_src} che, appena viene aperta la pagina, fa un primo test in GET per verificare il funzionamento di base del server Yaws.
+(Figura \ref{fig:test_comunicazione_messaggi_GET}).
+
+\begin{figure}[!hbtp]
+	\fbox{\includegraphics[width=1.0\textwidth]{figure/test_connessione_messaggi_GET.png}
+	}
+	\caption{Test comunicazione di base in modalit\`a GET}
+	\label{fig:test_comunicazione_messaggi_GET}
+\end{figure}
+
+Successivamente cliccando su \textit{Inizia invio dei messaggi al gestore messaggi.}, verr\`a inviato il primo messaggio di test al server dei messaggi (\textit{\textbf{test\_message\_m}}) e questo risponder\`a indicando che ha inserito il messaggio nella coda (\textit{\textbf{test\_result\_m}}) con l'ID che gli \`e stato assegnato come si pu\`o vedere in Figura \ref{fig:test_comunicazione_messaggi_POST_fase_1}.
+
+\begin{figure}[!hbtp]
+	\fbox{\includegraphics[width=1.0\textwidth]{figure/test_connessione_messaggi_POST_fase1.png}
+	}
+	\caption{Test comunicazione con gestore messaggi - Fase 1}
+	\label{fig:test_comunicazione_messaggi_POST_fase_1}
+\end{figure}
+
+Il client si mette in attesa e, dopo un certo tempo (5 secondi nel nostro caso) fa la richiesta per controllare lo stato del messaggio usando il comando \textit{\textbf{test\_message\_r}} passandogli l'ID che ha ricevuto nella fase precedente. Il server risponder\`a con il messaggio \textit{\textbf{test\_result\_r}}. Possiamo vedere il risultato della risposta in Figura \ref{fig:test_comunicazione_messaggi_POST_fase_2}.
+
+\begin{figure}[!hbtp]
+	\fbox{\includegraphics[width=1.0\textwidth]{figure/test_connessione_messaggi_POST_fase2.png}
+	}
+	\caption{Test comunicazione con gestore messaggi - Fase 2}
+	\label{fig:test_comunicazione_messaggi_POST_fase_2}
+\end{figure}
+
 
 
 \section{Stress test}
